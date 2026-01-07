@@ -9,7 +9,7 @@
 	 - [ ] visual bugs
 	 - [ ] white fix
 
-## Future:
+## future:
  - [ ] reimplement glow dot merging
  - [ ] .gmd exporting
  - [ ] MAYBE: hitbox fixing (easier to do with geode mods)
