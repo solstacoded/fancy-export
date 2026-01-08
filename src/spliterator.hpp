@@ -1,6 +1,5 @@
 #include <optional>
 #include <utility>
-#include <Geode/Geode.hpp>
 
 class Spliterator {
 protected: 
