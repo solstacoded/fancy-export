@@ -2,6 +2,7 @@
 
 #include <Geode/Geode.hpp>
 #include <Geode/binding/GJGameLevel.hpp>
+#include <Geode/cocos/actions/CCActionInterval.h>
 #include <Geode/ui/BasedButtonSprite.hpp>
 #include <Geode/utils/cocos.hpp>
 #include "FancyExportMenu.hpp"
@@ -27,12 +28,17 @@ class $modify(FancyEditLevelLayer, EditLevelLayer) {
             return true;
         }
         
-        // only professional code here
-        // m_onTop is protected, so we get it the sneaky way
-        auto inner_sprite = geode::cocos::getChild(button_sprite, 0);
-        if (inner_sprite) {
-            auto angle = 360.0f * (float)std::rand() / (float)RAND_MAX;
-            inner_sprite->setRotation(angle);
+        // we only have professional code here
+        auto inner_sprite = button_sprite->getTopNode();
+        
+        auto angle = 360.0f * (float)std::rand() / (float)RAND_MAX;
+        inner_sprite->setRotation(angle);
+        
+        if (std::rand() & 0x7f == 0) {
+            auto rotate_action = cocos2d::CCRepeatForever::create(
+                cocos2d::CCRotateBy::create(1.0, 10.0)
+            );
+            inner_sprite->runAction(rotate_action);
         }
         
         auto button = CCMenuItemSpriteExtra::create(
