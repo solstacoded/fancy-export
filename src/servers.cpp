@@ -10,6 +10,8 @@ using std::string;
 
 const string gameVersion = "22";
 const string binaryVersion = "42";
+const string SERVER_ROOT = "https://www.boomlings.com/database/";
+
 
 string make_gjp2(string &password) {
     SHA1 checksum;
@@ -18,7 +20,9 @@ string make_gjp2(string &password) {
     return checksum.final();
 }
 
+
 const char* LEVEL_CHK_XOR_CIPHER = "41274";
+
 string make_level_seed(string &level_string) {
     SHA1 checksum;
     
@@ -43,6 +47,7 @@ string make_level_seed(string &level_string) {
     return geode::utils::base64::encode(hash);
 }
 
+
 string make_uuid4() {
     // i probably shouldn't be using std rand but ¯\_(ツ)_/¯
     return std::format(
@@ -53,6 +58,7 @@ string make_uuid4() {
     );
     
 }
+
 
 void servers::attempt_login(
     string username, string password,
@@ -78,6 +84,7 @@ void servers::attempt_login(
                     callback(geode::Err("Unknown server error"));
                     return;
                 }
+                geode::log::debug("Login returned response {}", str);
                 Spliterator split(str, ',', false);
                 auto account_id = split.next();
                 if (!account_id.has_value()) {
@@ -124,4 +131,5 @@ void servers::attempt_login(
             callback(geode::Err("Web task cancelled"));
         }
     });
+    listener.setFilter(req.post(SERVER_ROOT + "accounts/loginGJAccount.php"));
 }
