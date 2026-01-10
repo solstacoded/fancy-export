@@ -59,6 +59,28 @@ string make_uuid4() {
     
 }
 
+// taken from https://github.com/geode-sdk/geode/blob/d21fd36bc77f299d88d704b34dd4380e8f401511/loader/src/utils/web.cpp#L377
+static std::string urlParamEncode(std::string_view input) {
+    std::ostringstream ss;
+    ss << std::hex << std::uppercase;
+    for (char c : input) {
+        if (std::isalnum(c) || c == '-' || c == '_' || c == '.' || c == '~') {
+            ss << c;
+        } else {
+            ss << '%' << static_cast<int>(c);
+        }
+    }
+    return ss.str();
+}
+
+inline string key_val(string key, string val, bool first=false) {
+    if (first) {
+        return urlParamEncode(key) + "=" + urlParamEncode(val);
+    }
+    else {
+        return "&" + urlParamEncode(key) + "=" + urlParamEncode(val);
+    }
+}
 
 void servers::attempt_login(
     string username, string password,
@@ -68,13 +90,17 @@ void servers::attempt_login(
     geode::utils::web::WebRequest req = geode::utils::web::WebRequest();
     
     auto gjp2 = make_gjp2(password);
-    req.param("secret", "Wmfv3899gc9");
-    req.param("gameVersion", gameVersion);
-    req.param("binaryVersion", binaryVersion);
-    req.param("gdw", "0");
-    req.param("udid", make_uuid4());
-    req.param("userName", username);
-    req.param("gjp2", gjp2);
+    auto params = key_val("secret", "Wmfv3899gc9", true)
+        + key_val("gameVersion", gameVersion)
+        + key_val("binaryVersion", binaryVersion)
+        + key_val("gdw", "0")
+        + key_val("udid", make_uuid4())
+        + key_val("userName", username)
+        + key_val("password", password)
+        + key_val("gjp2", gjp2);
+    
+    req.bodyString(params);
+    
     
     listener.bind([username, gjp2, callback] (geode::utils::web::WebTask::Event* e) {
         if (geode::utils::web::WebResponse* res = e->getValue()) {
