@@ -2,6 +2,7 @@
 
 #include <Geode/utils/web.hpp>
 #include <Geode/loader/Event.hpp>
+#include <Geode/binding/GJGameLevel.hpp>
 
 using std::string;
 
@@ -21,5 +22,12 @@ namespace servers {
         string username, string password,
         geode::EventListener<geode::utils::web::WebTask> &listener,
         std::function<void(geode::Result<AccountLogin, string>)> callback
+    );
+    
+    void attempt_upload_level(
+        const GJGameLevel* level, string name, const string &level_string,
+        AccountLogin &login,
+        geode::EventListener<geode::utils::web::WebTask> &listener,
+        std::function<void(geode::Result<int, string>)> callback
     );
 }

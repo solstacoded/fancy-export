@@ -23,7 +23,7 @@ string make_gjp2(string &password) {
 
 const char* LEVEL_CHK_XOR_CIPHER = "41274";
 
-string make_level_seed(string &level_string) {
+string make_level_seed(const string &level_string) {
     SHA1 checksum;
     
     if (level_string.length() <= 50) {
@@ -66,6 +66,8 @@ static std::string urlParamEncode(std::string_view input) {
     for (char c : input) {
         if (std::isalnum(c) || c == '-' || c == '_' || c == '.' || c == '~') {
             ss << c;
+        } else if (c == ' ') {
+            ss << '+';
         } else {
             ss << '%' << static_cast<int>(c);
         }
@@ -73,7 +75,7 @@ static std::string urlParamEncode(std::string_view input) {
     return ss.str();
 }
 
-inline string key_val(string key, string val, bool first=false) {
+inline string key_val(std::string_view key, std::string_view val, bool first=false) {
     if (first) {
         return urlParamEncode(key) + "=" + urlParamEncode(val);
     }
@@ -101,7 +103,6 @@ void servers::attempt_login(
     
     req.bodyString(params);
     
-    
     listener.bind([username, gjp2, callback] (geode::utils::web::WebTask::Event* e) {
         if (geode::utils::web::WebResponse* res = e->getValue()) {
             if (res->ok()) {
@@ -114,7 +115,7 @@ void servers::attempt_login(
                 Spliterator split(str, ',', false);
                 auto account_id = split.next();
                 if (!account_id.has_value()) {
-                    callback(geode::Err("Unknown server error"));
+                    callback(geode::Err("You should never get this error"));
                     return;
                 }
                 auto player_id = split.next();
@@ -139,12 +140,11 @@ void servers::attempt_login(
                         callback(geode::Err("Steam ID mismatch??? You should never get this error"));
                     }
                     else {
-                        callback(geode::Err("Unknown server error"));
+                        callback(geode::Err("Server returned unexpected value"));
                     }
                     return;
                 }
                 callback(geode::Ok(AccountLogin(username, gjp2, *account_id, *player_id)));
-                
             }
             else {
                 callback(geode::Err(res->string().unwrapOr("Unknown server error")));
@@ -158,4 +158,82 @@ void servers::attempt_login(
         }
     });
     listener.setFilter(req.post(SERVER_ROOT + "accounts/loginGJAccount.php"));
+}
+
+void servers::attempt_upload_level(
+    const GJGameLevel* level, string name, const string &level_string,
+    servers::AccountLogin &login,
+    geode::EventListener<geode::utils::web::WebTask> &listener,
+    std::function<void(geode::Result<int, string>)> callback
+) {
+    geode::utils::web::WebRequest req = geode::utils::web::WebRequest();
+    
+    auto level_seed = make_level_seed(level_string);
+    
+    auto params = key_val("gameVersion", gameVersion, true)
+        + key_val("accountID", login.m_account_id)
+        + key_val("gjp2", login.m_gjp2)
+        + key_val("userName", login.m_username)
+        + key_val("levelID", "0")
+        + key_val("levelName", name)
+        + key_val("levelDesc", geode::utils::base64::encode(level->m_levelDesc))
+        + key_val("levelVersion", "1")
+        + key_val("levelLength", std::to_string(level->m_levelLength))
+        + key_val("audioTrack", std::to_string(level->m_audioTrack))
+        + key_val("auto", "0")
+        + key_val("password", "1")
+        + key_val("original", "0")
+        + key_val("twoPlayer", level->m_twoPlayerMode ? "1" : "0")
+        + key_val("songID", std::to_string(level->m_songID))
+        + key_val("objects", std::to_string(level->m_objectCount))
+        + key_val("coins", "0")
+        + key_val("requestedStars", "0")
+        + key_val("unlisted", "1")
+        + key_val("ldm", "0")
+        + key_val("levelString", level_string)
+        + key_val("seed2", level_seed)
+        + key_val("secret", "Wmfd2893gb7")
+        + key_val("binaryVersion", binaryVersion)
+        + key_val("gdw", "0");
+    
+    //geode::log::debug("{}", params);
+    
+    req.bodyString(params);
+    
+    listener.bind([callback] (geode::utils::web::WebTask::Event* e) {
+        if (geode::utils::web::WebResponse* res = e->getValue()) {
+            if (res->ok()) {
+                auto str = res->string().unwrapOr("");
+                if (str.empty()) {
+                    callback(geode::Err("Unknown server error"));
+                    return;
+                }
+                geode::log::debug("Upload returned response {}", str);
+                int response_id;
+                try {
+                    response_id = std::stoi(str);
+                }
+                catch (std::invalid_argument const& ex) {
+                    callback(geode::Err("Server returned unexpected value"));
+                    return;
+                }
+                if (response_id < 0) {
+                    callback(geode::Err("Failed to upload level"));
+                }
+                else {
+                    callback(geode::Ok(response_id));
+                }
+            }
+            else {
+                callback(geode::Err(res->string().unwrapOr("Unknown server error")));
+            }
+        }
+        else if (geode::utils::web::WebProgress* p = e->getProgress()) {
+            // don't care
+        }
+        else if (e->isCancelled()) {
+            callback(geode::Err("Web task cancelled"));
+        }
+    });
+    listener.setFilter(req.post(SERVER_ROOT + "uploadGJLevel21.php"));
 }

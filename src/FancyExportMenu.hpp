@@ -107,6 +107,27 @@ protected:
         if (res.isOk()) {
             auto login = *res.ok();
             geode::log::debug("Logged in! acc {}, player {}", login.m_account_id, login.m_player_id);
+            servers::attempt_upload_level(
+                m_level,
+                m_level_name_input->getString(),
+                m_level->m_levelString,
+                login,
+                m_listener,
+                [this](auto res) { this->uploadCallback(res); }
+            );
+        }
+        else {
+            auto err = *res.err();
+            geode::log::debug("Error: {}", err);
+            m_login_button->setEnabled(true);
+        }
+        
+    }
+    
+    void uploadCallback(geode::Result<int, string> res) {
+        if (res.isOk()) {
+            auto level_id = *res.ok();
+            geode::log::debug("Uploaded to ID {}", level_id);
         }
         else {
             auto err = *res.err();
