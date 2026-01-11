@@ -7,6 +7,7 @@
 #include "spliterator.hpp"
 
 using std::string;
+using std::string_view;
 
 const string gameVersion = "22";
 const string binaryVersion = "42";
@@ -144,7 +145,7 @@ void server::attempt_login(
                     }
                     return;
                 }
-                callback(geode::Ok(AccountLogin(username, gjp2, *account_id, *player_id)));
+                callback(geode::Ok(AccountLogin(username, gjp2, string(*account_id), string(*player_id))));
             }
             else {
                 callback(geode::Err(res->string().unwrapOr("Unknown server error")));
