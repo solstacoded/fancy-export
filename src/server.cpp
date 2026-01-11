@@ -1,4 +1,4 @@
-#include "servers.hpp"
+#include "server.hpp"
 
 #include <Geode/Geode.hpp>
 #include <Geode/utils/base64.hpp>
@@ -84,10 +84,10 @@ inline string key_val(std::string_view key, std::string_view val, bool first=fal
     }
 }
 
-void servers::attempt_login(
+void server::attempt_login(
     string username, string password,
     geode::EventListener<geode::utils::web::WebTask> &listener,
-    std::function<void(geode::Result<servers::AccountLogin, string>)> callback
+    std::function<void(geode::Result<server::AccountLogin, string>)> callback
 ) {
     geode::utils::web::WebRequest req = geode::utils::web::WebRequest();
     
@@ -160,9 +160,9 @@ void servers::attempt_login(
     listener.setFilter(req.post(SERVER_ROOT + "accounts/loginGJAccount.php"));
 }
 
-void servers::attempt_upload_level(
+void server::attempt_upload_level(
     const GJGameLevel* level, string name, const string &level_string,
-    servers::AccountLogin &login,
+    server::AccountLogin &login,
     geode::EventListener<geode::utils::web::WebTask> &listener,
     std::function<void(geode::Result<int, string>)> callback
 ) {

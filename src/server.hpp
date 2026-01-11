@@ -6,7 +6,7 @@
 
 using std::string;
 
-namespace servers {
+namespace server {
     struct AccountLogin {
         string m_username;
         string m_gjp2;

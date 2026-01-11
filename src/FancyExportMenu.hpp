@@ -5,7 +5,7 @@
 #include <Geode/cocos/layers_scenes_transitions_nodes/CCLayer.h>
 #include <Geode/utils/cocos.hpp>
 
-#include "servers.hpp"
+#include "server.hpp"
 
 class FancyExportMenu : public geode::Popup<GJGameLevel const*> {
 protected:
@@ -95,7 +95,7 @@ protected:
         m_login_button->setEnabled(false);
         
         geode::log::debug("logging into {}...", m_username_input->getString());
-        servers::attempt_login(
+        server::attempt_login(
             m_username_input->getString(),
             m_password_input->getString(),
             m_listener,
@@ -103,11 +103,11 @@ protected:
         );
     }
     
-    void loginCallback(geode::Result<servers::AccountLogin, string> res) {
+    void loginCallback(geode::Result<server::AccountLogin, string> res) {
         if (res.isOk()) {
             auto login = *res.ok();
             geode::log::debug("Logged in! acc {}, player {}", login.m_account_id, login.m_player_id);
-            servers::attempt_upload_level(
+            server::attempt_upload_level(
                 m_level,
                 m_level_name_input->getString(),
                 m_level->m_levelString,
