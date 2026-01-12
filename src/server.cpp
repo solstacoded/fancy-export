@@ -14,7 +14,7 @@ const string binaryVersion = "42";
 const string SERVER_ROOT = "https://www.boomlings.com/database/";
 
 
-string make_gjp2(string &password) {
+string make_gjp2(string const& password) {
     SHA1 checksum;
     checksum.update(password);
     checksum.update("mI29fmAnxgTs");
@@ -24,7 +24,7 @@ string make_gjp2(string &password) {
 
 const char* LEVEL_CHK_XOR_CIPHER = "41274";
 
-string make_level_seed(const string &level_string) {
+string make_level_seed(string const& level_string) {
     SHA1 checksum;
     
     if (level_string.length() <= 50) {
@@ -61,7 +61,7 @@ string make_uuid4() {
 }
 
 // taken from https://github.com/geode-sdk/geode/blob/d21fd36bc77f299d88d704b34dd4380e8f401511/loader/src/utils/web.cpp#L377
-static std::string urlParamEncode(std::string_view input) {
+static std::string urlParamEncode(string_view input) {
     std::ostringstream ss;
     ss << std::hex << std::uppercase;
     for (char c : input) {
@@ -76,7 +76,7 @@ static std::string urlParamEncode(std::string_view input) {
     return ss.str();
 }
 
-inline string key_val(std::string_view key, std::string_view val, bool first=false) {
+inline string key_val(string_view const key, string_view const val, bool first=false) {
     if (first) {
         return urlParamEncode(key) + "=" + urlParamEncode(val);
     }
@@ -86,8 +86,8 @@ inline string key_val(std::string_view key, std::string_view val, bool first=fal
 }
 
 void server::attempt_login(
-    string username, string password,
-    geode::EventListener<geode::utils::web::WebTask> &listener,
+    string const username, string const password,
+    geode::EventListener<geode::utils::web::WebTask>& listener,
     std::function<void(geode::Result<server::AccountLogin, string>)> callback
 ) {
     geode::utils::web::WebRequest req = geode::utils::web::WebRequest();
@@ -162,9 +162,9 @@ void server::attempt_login(
 }
 
 void server::attempt_upload_level(
-    const GJGameLevel* level, string name, const string &level_string,
-    server::AccountLogin &login,
-    geode::EventListener<geode::utils::web::WebTask> &listener,
+    GJGameLevel const* level, string const name, string const& level_string,
+    server::AccountLogin const& login,
+    geode::EventListener<geode::utils::web::WebTask>& listener,
     std::function<void(geode::Result<int, string>)> callback
 ) {
     geode::utils::web::WebRequest req = geode::utils::web::WebRequest();

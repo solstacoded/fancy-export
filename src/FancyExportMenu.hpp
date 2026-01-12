@@ -6,6 +6,7 @@
 #include <Geode/utils/cocos.hpp>
 
 #include "server.hpp"
+#include "LevelObject.hpp"
 
 class FancyExportMenu : public geode::Popup<GJGameLevel const*> {
 protected:
@@ -107,10 +108,14 @@ protected:
         if (res.isOk()) {
             auto login = *res.ok();
             geode::log::debug("Logged in! acc {}, player {}", login.m_account_id, login.m_player_id);
+        
+            auto objects = LevelObject::from_level_string(m_level->m_levelString);
+            auto and_back_again = LevelObject::to_level_string(objects);
+            
             server::attempt_upload_level(
                 m_level,
                 m_level_name_input->getString(),
-                m_level->m_levelString,
+                and_back_again,
                 login,
                 m_listener,
                 [this](auto res) { this->uploadCallback(res); }

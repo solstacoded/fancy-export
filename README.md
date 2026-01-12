@@ -4,7 +4,7 @@
 [please use the script for now](https://github.com/solstacoded/fancy-1.9-level-reuploader/releases/latest)
 ## target for initial version:
  - [x] level uploading
- - [ ] level string unpacking/repacking
+ - [x] level string unpacking/repacking
  - [ ] reimplementing features from the reupload script
 	 - [ ] layer fixing
 	 - [ ] visual bugs

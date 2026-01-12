@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Geode/Geode.hpp>
+#include <iostream>
 
 #include "spliterator.hpp"
 
@@ -10,9 +11,9 @@ using std::string_view;
 struct LevelObject {
     std::map<string, string> inner;
     
-    static LevelObject from_obj_string(string_view obj_string) {
+    static LevelObject from_obj_string(string_view const obj_string) {
         std::map<string, string> map;
-        Spliterator split(obj_string, ':', false);
+        Spliterator split(obj_string, ',', false);
         
         auto next_pair = split.next_pair();
         while (next_pair.has_value()) {
@@ -23,7 +24,7 @@ struct LevelObject {
         return LevelObject { map };
     }
     
-    static std::vector<LevelObject> from_level_string(string_view level_string) {
+    static std::vector<LevelObject> from_level_string(string_view const level_string) {
         std::vector<LevelObject> vec;
     
         auto decompressed = cocos2d::ZipUtils::decompressString(string(level_string), false);
@@ -35,5 +36,15 @@ struct LevelObject {
             next = split.next();
         }
         return vec;
+    }
+    
+    friend std::ostream& operator<<(std::ostream &os, const LevelObject &obj);
+    
+    static string to_level_string(std::vector<LevelObject> const& objects) {
+        std::ostringstream os;
+        for (auto obj = objects.begin(); obj != objects.end(); obj++) {
+            os << *obj;
+        }
+        return cocos2d::ZipUtils::compressString(os.str(), false);
     }
 };

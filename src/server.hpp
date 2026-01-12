@@ -19,15 +19,15 @@ namespace server {
     };
     
     void attempt_login(
-        string username, string password,
-        geode::EventListener<geode::utils::web::WebTask> &listener,
+        string const username, string const password,
+        geode::EventListener<geode::utils::web::WebTask>& listener,
         std::function<void(geode::Result<AccountLogin, string>)> callback
     );
     
     void attempt_upload_level(
-        const GJGameLevel* level, string name, const string &level_string,
-        AccountLogin &login,
-        geode::EventListener<geode::utils::web::WebTask> &listener,
+        GJGameLevel const* level, string const name, string const& level_string,
+        AccountLogin const& login,
+        geode::EventListener<geode::utils::web::WebTask>& listener,
         std::function<void(geode::Result<int, string>)> callback
     );
 }
