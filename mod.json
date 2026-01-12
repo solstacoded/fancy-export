@@ -20,6 +20,9 @@
             "FancyExportSheet": [
                 "resources/sheet/*.png"
             ]
-        }
+        },
+        "files": [
+            "resources/obj_data.json"
+        ]
     }
 }
