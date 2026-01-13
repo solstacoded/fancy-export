@@ -1,11 +1,8 @@
 #pragma once
 
 #include <Geode/Geode.hpp>
-#include <Geode/binding/GJGameLevel.hpp>
-#include <Geode/cocos/actions/CCActionInterval.h>
-#include <Geode/ui/BasedButtonSprite.hpp>
-#include <Geode/utils/cocos.hpp>
-#include "FancyExportMenu.hpp"
+
+#include "layers/FancyExportMenu.hpp"
 
 #include <Geode/modify/EditLevelLayer.hpp>
 class $modify(FancyEditLevelLayer, EditLevelLayer) {
@@ -31,7 +28,7 @@ class $modify(FancyEditLevelLayer, EditLevelLayer) {
         // we only have professional code here
         auto inner_sprite = button_sprite->getTopNode();
         
-        auto angle = 360.0f * (float)std::rand() / (float)RAND_MAX;
+        auto angle = 360.0f * static_cast<float>(std::rand()) / static_cast<float>(RAND_MAX);
         inner_sprite->setRotation(angle);
         
         if (std::rand() & 0x7f == 0) {

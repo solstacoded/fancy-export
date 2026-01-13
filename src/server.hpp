@@ -1,8 +1,6 @@
 #pragma once
 
-#include <Geode/utils/web.hpp>
-#include <Geode/loader/Event.hpp>
-#include <Geode/binding/GJGameLevel.hpp>
+#include <Geode/Geode.hpp>
 
 using std::string;
 

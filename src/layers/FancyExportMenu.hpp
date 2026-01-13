@@ -1,13 +1,10 @@
 #pragma once
 
 #include <Geode/Geode.hpp>
-#include <Geode/binding/GJGameLevel.hpp>
-#include <Geode/cocos/layers_scenes_transitions_nodes/CCLayer.h>
-#include <Geode/utils/cocos.hpp>
 
-#include "server.hpp"
-#include "LevelObject.hpp"
-#include "ObjectHelper.hpp"
+#include "../server.hpp"
+#include "../classes/LevelObject.hpp"
+#include "../classes/ObjectHelper.hpp"
 
 class FancyExportMenu : public geode::Popup<GJGameLevel const*> {
 protected:

@@ -3,8 +3,8 @@
 #include <Geode/Geode.hpp>
 #include <Geode/utils/base64.hpp>
 
-#include "sha1.hpp"
-#include "spliterator.hpp"
+#include "utils/sha1.hpp"
+#include "utils/spliterator.hpp"
 
 using std::string;
 using std::string_view;

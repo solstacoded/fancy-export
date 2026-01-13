@@ -3,8 +3,8 @@
 #include <Geode/Geode.hpp>
 #include <iostream>
 
-#include "spliterator.hpp"
-#include "ObjectHelper.hpp"
+#include "../utils/Spliterator.hpp"
+#include "../classes/ObjectHelper.hpp"
 
 using std::string;
 using std::string_view;
