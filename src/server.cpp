@@ -4,7 +4,7 @@
 #include <Geode/utils/base64.hpp>
 
 #include "utils/sha1.hpp"
-#include "utils/spliterator.hpp"
+#include "utils/Spliterator.hpp"
 
 using std::string;
 using std::string_view;
