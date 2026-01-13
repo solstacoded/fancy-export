@@ -2,12 +2,12 @@
 
 #include <Geode/Geode.hpp>
 
-#include "layers/FancyExportMenu.hpp"
+#include "layers/FancyExportLayer.hpp"
 
 #include <Geode/modify/EditLevelLayer.hpp>
 class $modify(FancyEditLevelLayer, EditLevelLayer) {
     void onFancy(cocos2d::CCObject*) {
-        FancyExportMenu::create(m_level)->show();
+        FancyExportLayer::create(m_level)->show();
     }
     
     bool init(GJGameLevel* level) {

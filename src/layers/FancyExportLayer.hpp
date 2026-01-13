@@ -6,7 +6,7 @@
 #include "../classes/LevelObject.hpp"
 #include "../classes/ObjectHelper.hpp"
 
-class FancyExportMenu : public geode::Popup<GJGameLevel const*> {
+class FancyExportLayer : public geode::Popup<GJGameLevel const*> {
 protected:
     GJGameLevel const* m_level = nullptr;
     geode::EventListener<geode::utils::web::WebTask> m_listener;
@@ -65,7 +65,7 @@ protected:
         
         m_login_button = CCMenuItemSpriteExtra::create(
             ButtonSprite::create("Upload", "goldFont.fnt", "GJ_button_04.png", 0.6f),
-            this, menu_selector(FancyExportMenu::onLoginButton)
+            this, menu_selector(FancyExportLayer::onLoginButton)
         );
         auto login_button_menu = cocos2d::CCMenu::create();
         login_button_menu->setTouchPriority(-503);
@@ -153,9 +153,9 @@ protected:
     }
     
 public:
-    static FancyExportMenu* create(GJGameLevel const* level) {
+    static FancyExportLayer* create(GJGameLevel const* level) {
         
-        auto ret = new FancyExportMenu();
+        auto ret = new FancyExportLayer();
         if (ret->initAnchored(400.f, 240.f, level, "square-sunset.png"_spr)) {
             ret->autorelease();
             return ret;

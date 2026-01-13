@@ -220,7 +220,7 @@ bool LevelObject::unfix_glow() {
     case 84: [[fallthrough]];
     case 140: [[fallthrough]];
     case 141:
-        // slightly increasing value so pure black is never reached
+        // take a wild guess at what this does
         inner.insert_or_assign(Key::DisableGlow, "1");
         return true;
     default:
