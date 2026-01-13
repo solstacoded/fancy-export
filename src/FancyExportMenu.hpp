@@ -7,6 +7,7 @@
 
 #include "server.hpp"
 #include "LevelObject.hpp"
+#include "ObjectHelper.hpp"
 
 class FancyExportMenu : public geode::Popup<GJGameLevel const*> {
 protected:
@@ -87,6 +88,9 @@ protected:
             geode::Anchor::TopRight,
             cocos2d::CCPoint(-x_offset, -y_offset)
         );
+        
+        // testing
+        auto helper = obj_helper::get_shared_helper();
         
         return true;
     }
