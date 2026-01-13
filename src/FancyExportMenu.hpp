@@ -7,7 +7,6 @@
 
 #include "server.hpp"
 #include "LevelObject.hpp"
-#include "ObjectHelper.hpp"
 
 class FancyExportMenu : public geode::Popup<GJGameLevel const*> {
 protected:
@@ -89,9 +88,6 @@ protected:
             cocos2d::CCPoint(-x_offset, -y_offset)
         );
         
-        // testing
-        auto helper = obj_helper::get_shared_helper();
-        
         return true;
     }
     
@@ -114,6 +110,12 @@ protected:
             geode::log::debug("Logged in! acc {}, player {}", login.m_account_id, login.m_player_id);
         
             auto objects = LevelObject::from_level_string(m_level->m_levelString);
+            
+            // first object is startobject and we don't want to change that
+            for (int i = 1; i < objects.size(); i++) {
+                objects[i].fix_layers();
+            }
+            
             auto and_back_again = LevelObject::to_level_string(objects);
             
             server::attempt_upload_level(

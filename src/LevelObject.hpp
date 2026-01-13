@@ -47,4 +47,7 @@ struct LevelObject {
         }
         return cocos2d::ZipUtils::compressString(os.str(), false);
     }
+    
+    bool fix_layers();
+    
 };

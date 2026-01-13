@@ -6,9 +6,10 @@
  - [x] level uploading
  - [x] level string unpacking/repacking
  - [ ] reimplementing features from the reupload script
-	 - [ ] layer fixing
+	 - [x] layer fixing
 	 - [ ] visual bugs
 	 - [ ] white fix
+ - [ ] make a ui that doesn't suck balls
 
 ## Future:
  - [ ] reimplement glow dot merging
