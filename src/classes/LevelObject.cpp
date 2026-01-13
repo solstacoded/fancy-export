@@ -54,7 +54,7 @@ std::ostream& operator<<(std::ostream &os, const LevelObject &obj) {
 }
 
 
-Color get_effective_color(LevelObject const& obj) {
+Color get_effective_color(LevelObject const& obj, ObjectHelper const* helper) {
     const auto inner = obj.inner;
     // if we've already fixed white then Key::Color is emptied
     if (
@@ -79,7 +79,7 @@ Color get_effective_color(LevelObject const& obj) {
         catch (std::out_of_range const&) {}
     }
     auto id = inner.at(Key::ID);
-    auto helper = obj_helper::get_shared_helper();
+    
     if (helper && helper->m_obj_data.contains(id)) {
         return static_cast<Color>(helper->m_obj_data.at(id).default_color);
     }
@@ -87,7 +87,7 @@ Color get_effective_color(LevelObject const& obj) {
 }
 
 
-bool LevelObject::fix_layers(obj_helper::ObjectHelper const* helper) {
+bool LevelObject::fix_layers(ObjectHelper const* helper) {
     auto id = inner.at(Key::ID);
     if (!helper || !helper->m_obj_data.contains(id)) {
         return false;
@@ -102,7 +102,7 @@ bool LevelObject::fix_layers(obj_helper::ObjectHelper const* helper) {
         base_color = static_cast<Color>(obj_data.default_color);
     }
     else {
-        base_color = get_effective_color(*this);
+        base_color = get_effective_color(*this, helper);
     }
     
     bool bottom;
@@ -130,11 +130,11 @@ bool LevelObject::fix_layers(obj_helper::ObjectHelper const* helper) {
 }
 
 
-bool LevelObject::fix_white(obj_helper::ObjectHelper const* helper) {
+bool LevelObject::fix_white(ObjectHelper const* helper) {
     if (!helper) {
         return false;
     }
-    auto is_white = (get_effective_color(*this) == Color::White);
+    auto is_white = (get_effective_color(*this, helper) == Color::White);
     if (is_white) {
         inner.erase(Key::Color);
         auto id = inner.at(Key::ID);

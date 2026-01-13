@@ -86,6 +86,8 @@ protected:
             cocos2d::CCPoint(-x_offset, -y_offset)
         );
         
+        auto helper = obj_helper::getSharedHelper();
+        
         return true;
     }
     
@@ -109,7 +111,7 @@ protected:
         
             auto objects = LevelObject::from_level_string(m_level->m_levelString);
             
-            auto helper = obj_helper::get_shared_helper();
+            auto helper = obj_helper::getSharedHelper();
             // first object is startobject and we don't want to change that
             for (int i = 1; i < objects.size(); i++) {
                 objects[i].fix_layers(helper);

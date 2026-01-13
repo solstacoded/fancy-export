@@ -49,8 +49,8 @@ struct LevelObject {
         return cocos2d::ZipUtils::compressString(os.str(), false);
     }
     
-    bool fix_layers(obj_helper::ObjectHelper const* helper);
-    bool fix_white(obj_helper::ObjectHelper const* helper);
+    bool fix_layers(ObjectHelper const* helper);
+    bool fix_white(ObjectHelper const* helper);
     bool fix_wavy_blocks();
     bool unfix_uncolored_3d();
     bool unfix_glow();
