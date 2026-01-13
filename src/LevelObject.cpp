@@ -19,7 +19,10 @@ namespace Key {
     const string ZOrder = "25";
     
     const string MainHSVEnabled = "41";
+    
     const string MainHSVString = "43";
+    
+    const string DisableGlow = "96";
 };
 
 const string NEW_WHITE = "1011";
@@ -37,6 +40,7 @@ enum Color {
     White = 9
 };
 
+
 std::ostream& operator<<(std::ostream &os, const LevelObject &obj) {
     
     for (auto kv = obj.inner.begin(); kv != obj.inner.end(); kv++) {
@@ -48,6 +52,7 @@ std::ostream& operator<<(std::ostream &os, const LevelObject &obj) {
     os << ';';
     return os;
 }
+
 
 Color get_effective_color(LevelObject const& obj) {
     const auto inner = obj.inner;
@@ -81,9 +86,9 @@ Color get_effective_color(LevelObject const& obj) {
     return Color::None;
 }
 
-bool LevelObject::fix_layers() {
+
+bool LevelObject::fix_layers(obj_helper::ObjectHelper const* helper) {
     auto id = inner.at(Key::ID);
-    auto helper = obj_helper::get_shared_helper();
     if (!helper || !helper->m_obj_data.contains(id)) {
         return false;
     }
@@ -122,4 +127,103 @@ bool LevelObject::fix_layers() {
         bottom ? "2":"4"
     );
     return true;
+}
+
+
+bool LevelObject::fix_white(obj_helper::ObjectHelper const* helper) {
+    if (!helper) {
+        return false;
+    }
+    auto is_white = (get_effective_color(*this) == Color::White);
+    if (is_white) {
+        inner.erase(Key::Color);
+        auto id = inner.at(Key::ID);
+        if (helper->m_obj_data.contains(id) && helper->m_obj_data.at(id).secondary) {
+            inner.insert_or_assign(Key::NewSecondaryColor, NEW_WHITE);
+        }
+        else {
+            inner.insert_or_assign(Key::NewMainColor, NEW_WHITE);
+        }
+    }
+    return is_white;
+}
+
+
+bool LevelObject::fix_wavy_blocks() {
+    int id;
+    try {
+        id = std::stoi(inner.at(Key::ID));
+    }
+    catch (std::invalid_argument const&) {
+        return false;
+    }
+    catch (std::out_of_range const&) {
+        return false;
+    }
+    switch (id) {
+    case 62: [[fallthrough]];
+    case 63: [[fallthrough]];
+    case 64: [[fallthrough]];
+    case 65: [[fallthrough]];
+    case 66: [[fallthrough]];
+    case 68: [[fallthrough]];
+    case 294: [[fallthrough]];
+    case 295: [[fallthrough]];
+    case 296: [[fallthrough]];
+    case 297:
+        // slightly increasing value so pure black is never reached
+        inner.insert_or_assign(Key::MainHSVEnabled, "1");
+        inner.insert_or_assign(Key::MainHSVString, "0a1a0.02a0a1");
+        return true;
+    default:
+        return false;
+    }
+}
+
+
+bool LevelObject::unfix_uncolored_3d() {
+    int id;
+    try {
+        id = std::stoi(inner.at(Key::ID));
+    }
+    catch (std::invalid_argument const&) {
+        return false;
+    }
+    catch (std::out_of_range const&) {
+        return false;
+    }
+    // all of the uncolored 3d is contiguous which is very convenient
+    if (560 <= id && id <= 577) {
+        inner.insert_or_assign(Key::NewMainColor, NEW_WHITE);
+        return true;
+    }
+    return false;
+}
+
+
+bool LevelObject::unfix_glow() {
+    int id;
+    try {
+        id = std::stoi(inner.at(Key::ID));
+    }
+    catch (std::invalid_argument const&) {
+        return false;
+    }
+    catch (std::out_of_range const&) {
+        return false;
+    }
+    switch (id) {
+    case 36: [[fallthrough]];
+    case 63: [[fallthrough]];
+    case 64: [[fallthrough]];
+    case 67: [[fallthrough]];
+    case 84: [[fallthrough]];
+    case 140: [[fallthrough]];
+    case 141:
+        // slightly increasing value so pure black is never reached
+        inner.insert_or_assign(Key::DisableGlow, "1");
+        return true;
+    default:
+        return false;
+    }
 }

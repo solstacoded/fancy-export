@@ -5,10 +5,10 @@
 ## target for initial version:
  - [x] level uploading
  - [x] level string unpacking/repacking
- - [ ] reimplementing features from the reupload script
+ - [x] reimplementing features from the reupload script
 	 - [x] layer fixing
-	 - [ ] visual bugs
-	 - [ ] white fix
+	 - [x] visual bugs
+	 - [x] white fix
  - [ ] make a ui that doesn't suck balls
 
 ## Future:

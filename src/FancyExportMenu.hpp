@@ -7,6 +7,7 @@
 
 #include "server.hpp"
 #include "LevelObject.hpp"
+#include "ObjectHelper.hpp"
 
 class FancyExportMenu : public geode::Popup<GJGameLevel const*> {
 protected:
@@ -111,9 +112,14 @@ protected:
         
             auto objects = LevelObject::from_level_string(m_level->m_levelString);
             
+            auto helper = obj_helper::get_shared_helper();
             // first object is startobject and we don't want to change that
             for (int i = 1; i < objects.size(); i++) {
-                objects[i].fix_layers();
+                objects[i].fix_layers(helper);
+                objects[i].fix_white(helper);
+                objects[i].fix_wavy_blocks();
+                objects[i].unfix_uncolored_3d();
+                objects[i].unfix_glow();
             }
             
             auto and_back_again = LevelObject::to_level_string(objects);

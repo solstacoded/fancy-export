@@ -4,6 +4,7 @@
 #include <iostream>
 
 #include "spliterator.hpp"
+#include "ObjectHelper.hpp"
 
 using std::string;
 using std::string_view;
@@ -48,6 +49,10 @@ struct LevelObject {
         return cocos2d::ZipUtils::compressString(os.str(), false);
     }
     
-    bool fix_layers();
+    bool fix_layers(obj_helper::ObjectHelper const* helper);
+    bool fix_white(obj_helper::ObjectHelper const* helper);
+    bool fix_wavy_blocks();
+    bool unfix_uncolored_3d();
+    bool unfix_glow();
     
 };
