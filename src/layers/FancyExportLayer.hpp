@@ -6,10 +6,37 @@
 #include "../classes/LevelObject.hpp"
 #include "../classes/ObjectHelper.hpp"
 
+struct ProcessingOptions {
+    bool fix_layers = false;
+    bool fix_white = false;
+    bool fix_wavy_blocks = false;
+    bool unfix_uncolored_3d = false;
+    bool unfix_glow = false;
+    
+    bool operator==(ProcessingOptions const& other) {
+        return (
+            fix_layers == other.fix_layers
+            && fix_white == other.fix_white
+            && fix_wavy_blocks == other.fix_wavy_blocks
+            && unfix_uncolored_3d == other.unfix_uncolored_3d
+            && unfix_glow == other.unfix_glow
+        );
+    }
+};
+
 class FancyExportLayer : public geode::Popup<GJGameLevel const*> {
 protected:
     GJGameLevel const* m_level = nullptr;
+    std::string m_level_string;
+    ProcessingOptions m_options_cache;
+    
+    ProcessingOptions m_processing_options;
+    
     geode::EventListener<geode::utils::web::WebTask> m_listener;
+    
+    cocos2d::CCLayer* m_options_layer = nullptr;
+    cocos2d::CCLayer* m_export_layer = nullptr;
+    
     geode::TextInput* m_username_input = nullptr;
     geode::TextInput* m_password_input = nullptr;
     geode::TextInput* m_level_name_input = nullptr;
@@ -20,77 +47,29 @@ protected:
         FLAlertLayer::registerWithTouchDispatcher();
     }
     
-    bool setup(GJGameLevel const* level) override {
-        if (level == nullptr) {
-            return false;
-        }
-        m_level = level;
-        this->setTitle("Fancy Export");
-        
-        auto login_layer = cocos2d::CCLayer::create();
-        login_layer->setLayout(
-            geode::ColumnLayout::create()
-                ->setAxisReverse(true)
-                ->setAutoScale(false)
-                ->setAutoGrowAxis(0.0f)
-                ->setGap(14.0f)
-        );
-        //auto label = cocos2d::CCLabelBMFont::create(":33", "bigFont.fnt");
-        //label->limitLabelWidth(120.0f, 0.8f, 0.1f);
-        //label->setScale(0.001f);
-        //login_layer->addChild(label);
-        
-        m_username_input = geode::TextInput::create(160.0f, "Username");
-        m_username_input->setLabel("Username");
-        m_username_input->setCommonFilter(geode::CommonFilter::Name);
-        m_username_input->setMaxCharCount(16);
-        m_username_input->setEnabled(true);
-        login_layer->addChild(m_username_input);
-        
-        m_password_input = geode::TextInput::create(160.0f, "Password");
-        m_password_input->setLabel("Password");
-        // not technically correct for passwords but i can't be bothered doing it properly right now
-        m_password_input->setCommonFilter(geode::CommonFilter::Any);
-        m_password_input->setMaxCharCount(20);
-        m_password_input->setPasswordMode(true);
-        m_password_input->setEnabled(true);
-        login_layer->addChild(m_password_input);
-        
-        m_level_name_input = geode::TextInput::create(160.0f, "Level Name");
-        m_level_name_input->setLabel("Level Name");
-        m_level_name_input->setCommonFilter(geode::CommonFilter::Name);
-        m_level_name_input->setMaxCharCount(20);
-        m_level_name_input->setEnabled(true);
-        login_layer->addChild(m_level_name_input);
-        
-        m_login_button = CCMenuItemSpriteExtra::create(
-            ButtonSprite::create("Upload", "goldFont.fnt", "GJ_button_04.png", 0.6f),
-            this, menu_selector(FancyExportLayer::onLoginButton)
-        );
-        auto login_button_menu = cocos2d::CCMenu::create();
-        login_button_menu->setTouchPriority(-503);
-        login_button_menu->setLayout(
-            geode::ColumnLayout::create()
-                ->setAutoGrowAxis(0.0f)
-        );
-        login_button_menu->addChild(m_login_button);
-        login_button_menu->updateLayout();
-        login_layer->addChild(login_button_menu);
-        
-        login_layer->updateLayout();
-        auto x_offset = 10.0f + login_layer->getContentSize().width * 0.5f;
-        auto y_offset = 45.0f + login_layer->getContentSize().height * 0.5f;
-        m_mainLayer->addChildAtPosition(
-            login_layer,
-            geode::Anchor::TopRight,
-            cocos2d::CCPoint(-x_offset, -y_offset)
-        );
-        
-        auto helper = obj_helper::getSharedHelper();
-        
-        return true;
+    bool setup(GJGameLevel const* level) override;
+    
+    // i feel like yanderedev
+    void onFixLayersToggle(cocos2d::CCObject*) {
+        m_processing_options.fix_layers = !m_processing_options.fix_layers;
     }
     
+    void onFixWhiteToggle(cocos2d::CCObject*) {
+        m_processing_options.fix_white = !m_processing_options.fix_white;
+    }
+    
+    void onFixWavyBlocksToggle(cocos2d::CCObject*) {
+        m_processing_options.fix_wavy_blocks = !m_processing_options.fix_wavy_blocks;
+    }
+    
+    void onUnfixGlowToggle(cocos2d::CCObject*) {
+        m_processing_options.unfix_glow = !m_processing_options.unfix_glow;
+    }
+    
+    void onUnfixUncolored3DToggle(cocos2d::CCObject*) {
+        m_processing_options.unfix_uncolored_3d = !m_processing_options.unfix_uncolored_3d;
+    }
+    /*
     void onLoginButton(cocos2d::CCObject*) {
         geode::log::debug("login button pressed !!!");
         m_login_button->setEnabled(false);
@@ -150,7 +129,7 @@ protected:
             geode::log::debug("Error: {}", err);
         }
         m_login_button->setEnabled(true);
-    }
+    }*/
     
 public:
     static FancyExportLayer* create(GJGameLevel const* level) {
