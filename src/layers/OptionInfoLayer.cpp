@@ -5,7 +5,7 @@
 #include "../layers/FancyExportLayer.hpp"
 
 #define WINDOW_WIDTH 300.0f
-#define WINDOW_HEIGHT 200.0f
+#define WINDOW_HEIGHT 240.0f
 #define SIDE_PADDING 10.0f
 #define TOP_PADDING 12.0f
 #define BOTTOM_PADDING 10.0f
@@ -56,6 +56,9 @@ bool OptionInfoLayer::setup(ProcessingOption option) {
         text, geode::Anchor::Top,
         ccp(0.0f, -(textbox_offset + text->getContentSize().height*0.5f))
     );
+    
+    auto close_sprite = cocos2d::CCSprite::createWithSpriteFrameName("close-button-dusk.png"_spr);
+    setCloseButtonSpr(close_sprite, 0.8f);
     
     return true;
 }

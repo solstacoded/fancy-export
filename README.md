@@ -9,7 +9,8 @@
 	 - [x] layer fixing
 	 - [x] visual bugs
 	 - [x] white fix
- - [ ] make a ui that doesn't suck balls
+ - [x] make a ui that doesn't suck balls
+ - [ ] make the ui functional
 
 ## Future:
  - [ ] reimplement glow dot merging

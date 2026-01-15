@@ -13,8 +13,12 @@
 #define EXPORT_LAYER_WIDTH 180.0f
 #define OPTIONS_LAYER_WIDTH (WINDOW_WIDTH - EXPORT_LAYER_WIDTH - 3*SIDE_PADDING)
 
-#define OPTIONS_MEMBER_GAP 8.0f
+#define OPTIONS_MEMBER_GAP 6.0f
 #define OPTIONS_GAP 16.0f
+
+#define TEXT_LABEL_HEIGHT 12.0f
+#define EXPORT_TEXTBOX_GAP 4.0f
+#define EXPORT_UPLOAD_GAP (12.0f - EXPORT_TEXTBOX_GAP)
 
 
 void FancyExportLayer::addOption(ProcessingOption option) {
@@ -64,8 +68,8 @@ void FancyExportLayer::addOption(ProcessingOption option) {
         ->setAutoGrowAxis(0.0f)
     );
     
-    menu->addChild(checkbox);
     menu->addChild(info_button);
+    menu->addChild(checkbox);
     menu->addChild(label);
     menu->updateLayout();
     m_options_layer->addChild(menu);
@@ -108,20 +112,89 @@ bool FancyExportLayer::setup(GJGameLevel const* level) {
     // == right hand side - logins and (future) gmd export
     m_export_layer = cocos2d::CCLayer::create();
     m_export_layer->setLayout(
-        geode::ColumnLayout::create()
-            ->setAxisReverse(true)
-            ->setAxisAlignment(geode::AxisAlignment::Between)
-            ->setAutoScale(false)
+        geode::AnchorLayout::create()
     );
     m_export_layer->setContentSize(ccp(EXPORT_LAYER_WIDTH, LAYER_HEIGHT));
     
+    m_username_input = geode::TextInput::create(
+        EXPORT_LAYER_WIDTH, "Username", "bigFont.fnt"
+    );
+    m_username_input->setLabel("2.2 Username");
+    m_username_input->setCommonFilter(geode::CommonFilter::Name);
+    m_username_input->setMaxCharCount(16);
     
+    auto text_input_height = m_username_input->getContentSize().height;
+    auto prev_text_inputs = TEXT_LABEL_HEIGHT + text_input_height + EXPORT_TEXTBOX_GAP;
+    // manually positioning elements because columnlayout was being really annoying
+    m_export_layer->addChildAtPosition(
+        m_username_input, geode::Anchor::Top,
+        ccp(0.0f, -(TEXT_LABEL_HEIGHT + 0.5*text_input_height))
+    );
+    
+    m_password_input = geode::TextInput::create(
+        EXPORT_LAYER_WIDTH, "Password", "bigFont.fnt"
+    );
+    m_password_input->setLabel("2.2 Password");
+    m_password_input->setCommonFilter(geode::CommonFilter::Any);
+    m_password_input->setMaxCharCount(20);
+    
+    m_export_layer->addChildAtPosition(
+        m_password_input, geode::Anchor::Top,
+        ccp(0.0f, -(TEXT_LABEL_HEIGHT + 0.5*text_input_height + prev_text_inputs))
+    );
+    
+    m_level_name_input = geode::TextInput::create(
+        EXPORT_LAYER_WIDTH, "Level Name", "bigFont.fnt"
+    );
+    m_level_name_input->setLabel("Level Name");
+    m_level_name_input->setCommonFilter(geode::CommonFilter::Name);
+    m_level_name_input->setMaxCharCount(20);
+    m_level_name_input->setString(m_level->m_levelName);
+    
+    m_export_layer->addChildAtPosition(
+        m_level_name_input, geode::Anchor::Top,
+        ccp(0.0f, -(TEXT_LABEL_HEIGHT + 0.5*text_input_height + 2*prev_text_inputs))
+    );
+    
+    auto upload_menu = cocos2d::CCMenu::create();
+    upload_menu->setLayout(
+        geode::RowLayout::create()
+            ->setAutoScale(false)
+            ->setAxisAlignment(geode::AxisAlignment::Start)
+            ->setCrossAxisOverflow(true)
+            ->setGap(6.0f)
+    );
+    auto upload_button_sprite = ButtonSprite::create("Upload", "goldFont.fnt", "button-dusk.png"_spr, 0.6f);
+    auto upload_button = CCMenuItemSpriteExtra::create(
+        upload_button_sprite, this, menu_selector(FancyExportLayer::onUploadButton)
+    );
+    upload_button->setLayoutOptions(
+        geode::AxisLayoutOptions::create()
+            ->setNextGap(16.0f)
+    );
+    m_unlisted_toggle = CCMenuItemToggler::createWithStandardSprites(this, nullptr, 0.6f);
+    
+    auto unlisted_label = cocos2d::CCLabelBMFont::create("Unlisted", "bigFont.fnt");
+    unlisted_label->setScale(0.4f);
+    upload_menu->addChild(upload_button);
+    upload_menu->addChild(m_unlisted_toggle);
+    upload_menu->addChild(unlisted_label);
+    upload_menu->setContentSize(ccp(EXPORT_LAYER_WIDTH, 0.0f));
+    upload_menu->updateLayout();
+    
+    m_export_layer->addChildAtPosition(
+        upload_menu, geode::Anchor::Top,
+        ccp(0.0f, -(0.5*upload_menu->getContentSize().height + 3*prev_text_inputs + EXPORT_UPLOAD_GAP))
+    );
     
     m_export_layer->updateLayout();
     m_mainLayer->addChildAtPosition(
         m_export_layer, geode::Anchor::BottomRight,
         ccp(-(EXPORT_LAYER_WIDTH*0.5f + SIDE_PADDING), LAYER_HEIGHT*0.5f + BOTTOM_PADDING)
     );
+    
+    auto close_sprite = cocos2d::CCSprite::createWithSpriteFrameName("close-button-dusk.png"_spr);
+    setCloseButtonSpr(close_sprite, 0.8f);
     
     return true;
 }

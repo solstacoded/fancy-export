@@ -4,6 +4,7 @@
 
 #include "../server.hpp"
 #include "../layers/OptionInfoLayer.hpp"
+#include "../classes/Popup.hpp"
 
 struct ProcessingOptions {
     bool fix_layers = false;
@@ -31,7 +32,7 @@ enum ProcessingOption {
     UnfixUncolored3D,
 };
 
-class FancyExportLayer : public geode::Popup<GJGameLevel const*> {
+class FancyExportLayer : public not_geode::Popup<GJGameLevel const*> {
 protected:
     GJGameLevel const* m_level = nullptr;
     std::string m_level_string;
@@ -48,11 +49,7 @@ protected:
     geode::TextInput* m_password_input = nullptr;
     geode::TextInput* m_level_name_input = nullptr;
     CCMenuItemSpriteExtra* m_login_button = nullptr;
-    
-    // whatever the fuck geode::Popup<...> does here fucks up touch prio. so we just don't do that
-    //void registerWithTouchDispatcher() override {
-    //    FLAlertLayer::registerWithTouchDispatcher();
-    //}
+    CCMenuItemToggler* m_unlisted_toggle = nullptr;
     
     bool setup(GJGameLevel const* level) override;
     
@@ -92,6 +89,8 @@ protected:
         
         OptionInfoLayer::create(option)->show();
     }
+    
+    void onUploadButton(cocos2d::CCObject*) {}
     
 public:
     static FancyExportLayer* create(GJGameLevel const* level) {
