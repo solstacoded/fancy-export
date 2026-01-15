@@ -24,6 +24,14 @@ struct ProcessingOptions {
     }
 };
 
+enum ProcessingOption {
+    FixLayers = 0,
+    FixWhite,
+    FixWavyBlocks,
+    UnfixGlow,
+    UnfixUncolored3D,
+};
+
 class FancyExportLayer : public geode::Popup<GJGameLevel const*> {
 protected:
     GJGameLevel const* m_level = nullptr;
@@ -49,46 +57,41 @@ protected:
     
     bool setup(GJGameLevel const* level) override;
     
-    // i feel like yanderedev
-    void onFixLayersToggle(cocos2d::CCObject*) {
-        m_processing_options.fix_layers = !m_processing_options.fix_layers;
-    }
+    void addOption(ProcessingOption option);
     
-    void onFixWhiteToggle(cocos2d::CCObject*) {
-        m_processing_options.fix_white = !m_processing_options.fix_white;
-    }
-    
-    void onFixWavyBlocksToggle(cocos2d::CCObject*) {
-        m_processing_options.fix_wavy_blocks = !m_processing_options.fix_wavy_blocks;
-    }
-    
-    void onUnfixGlowToggle(cocos2d::CCObject*) {
-        m_processing_options.unfix_glow = !m_processing_options.unfix_glow;
-    }
-    
-    void onUnfixUncolored3DToggle(cocos2d::CCObject*) {
-        m_processing_options.unfix_uncolored_3d = !m_processing_options.unfix_uncolored_3d;
-    }
-    
-    void onFixLayersInfo(cocos2d::CCObject*) {
+    void onOptionsToggle(cocos2d::CCObject* sender) {
+        auto toggler = static_cast<CCMenuItemToggler*>(sender);
+        auto option = static_cast<ProcessingOption>(toggler->getTag());
         
+        switch (option) {
+        case ProcessingOption::FixLayers:
+            m_processing_options.fix_layers = !toggler->m_toggled;
+            geode::log::debug("fix_layers {}", !toggler->m_toggled);
+            break;
+        case ProcessingOption::FixWhite:
+            m_processing_options.fix_white = !toggler->m_toggled;
+            geode::log::debug("fix_white {}", !toggler->m_toggled);
+            break;
+        case ProcessingOption::FixWavyBlocks:
+            m_processing_options.fix_wavy_blocks = !toggler->m_toggled;
+            geode::log::debug("fix_wavy_blocks {}", !toggler->m_toggled);
+            break;
+        case ProcessingOption::UnfixGlow:
+            m_processing_options.unfix_glow = !toggler->m_toggled;
+            geode::log::debug("unfix_glow {}", !toggler->m_toggled);
+            break;
+        case ProcessingOption::UnfixUncolored3D:
+            m_processing_options.unfix_uncolored_3d = !toggler->m_toggled;
+            geode::log::debug("unfix_uncolored_3d {}", !toggler->m_toggled);
+            break;
+        }
     }
     
-    void onFixWhiteInfo(cocos2d::CCObject*) {
-        
+    void onOptionsInfo(cocos2d::CCObject* sender) {
+        auto node = static_cast<cocos2d::CCNode*>(sender);
+        auto option = static_cast<ProcessingOption>(node->getTag());
     }
     
-    void onFixWavyBlocksInfo(cocos2d::CCObject*) {
-        
-    }
-    
-    void onUnfixGlowInfo(cocos2d::CCObject*) {
-        
-    }
-    
-    void onUnfixUncolored3DInfo(cocos2d::CCObject*) {
-        
-    }
     /*
     void onLoginButton(cocos2d::CCObject*) {
         geode::log::debug("login button pressed !!!");
