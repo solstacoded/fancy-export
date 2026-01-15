@@ -162,7 +162,7 @@ bool FancyExportLayer::setup(GJGameLevel const* level) {
             ->setAutoScale(false)
             ->setAxisAlignment(geode::AxisAlignment::Start)
             ->setCrossAxisOverflow(true)
-            ->setGap(6.0f)
+            ->setGap(5.0f)
     );
     auto upload_button_sprite = ButtonSprite::create("Upload", "goldFont.fnt", "button-dusk.png"_spr, 0.6f);
     auto upload_button = CCMenuItemSpriteExtra::create(
