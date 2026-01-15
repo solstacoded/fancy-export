@@ -2,9 +2,7 @@
 
 #include <Geode/Geode.hpp>
 
-
-
-#define WINDOW_WIDTH 400.0f
+#define WINDOW_WIDTH 420.0f
 #define WINDOW_HEIGHT 240.0f
 #define SIDE_PADDING 10.0f
 #define TOP_PADDING 36.0f
@@ -16,7 +14,8 @@
 #define OPTIONS_LAYER_WIDTH (WINDOW_WIDTH - EXPORT_LAYER_WIDTH - 3*SIDE_PADDING)
 
 #define OPTIONS_MEMBER_GAP 8.0f
-#define OPTIONS_GAP 10.0f
+#define OPTIONS_GAP 16.0f
+
 
 void FancyExportLayer::addOption(ProcessingOption option) {
     char const* label_string;

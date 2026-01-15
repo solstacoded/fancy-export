@@ -4,6 +4,7 @@
 #include <iostream>
 
 #include "../utils/Spliterator.hpp"
+
 #include "../classes/ObjectHelper.hpp"
 
 using std::string;

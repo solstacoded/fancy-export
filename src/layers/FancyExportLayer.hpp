@@ -3,8 +3,7 @@
 #include <Geode/Geode.hpp>
 
 #include "../server.hpp"
-#include "../classes/LevelObject.hpp"
-#include "../classes/ObjectHelper.hpp"
+#include "../layers/OptionInfoLayer.hpp"
 
 struct ProcessingOptions {
     bool fix_layers = false;
@@ -90,75 +89,15 @@ protected:
     void onOptionsInfo(cocos2d::CCObject* sender) {
         auto node = static_cast<cocos2d::CCNode*>(sender);
         auto option = static_cast<ProcessingOption>(node->getTag());
-    }
-    
-    /*
-    void onLoginButton(cocos2d::CCObject*) {
-        geode::log::debug("login button pressed !!!");
-        m_login_button->setEnabled(false);
         
-        geode::log::debug("logging into {}...", m_username_input->getString());
-        server::attempt_login(
-            m_username_input->getString(),
-            m_password_input->getString(),
-            m_listener,
-            [this](auto res) { this->loginCallback(res); }
-        );
+        OptionInfoLayer::create(option)->show();
     }
-    
-    void loginCallback(geode::Result<server::AccountLogin, string> res) {
-        if (res.isOk()) {
-            auto login = *res.ok();
-            geode::log::debug("Logged in! acc {}, player {}", login.m_account_id, login.m_player_id);
-        
-            auto objects = LevelObject::from_level_string(m_level->m_levelString);
-            
-            auto helper = obj_helper::getSharedHelper();
-            // first object is startobject and we don't want to change that
-            for (int i = 1; i < objects.size(); i++) {
-                objects[i].fix_layers(helper);
-                objects[i].fix_white(helper);
-                objects[i].fix_wavy_blocks();
-                objects[i].unfix_uncolored_3d();
-                objects[i].unfix_glow();
-            }
-            
-            auto and_back_again = LevelObject::to_level_string(objects);
-            
-            server::attempt_upload_level(
-                m_level,
-                m_level_name_input->getString(),
-                and_back_again,
-                login,
-                m_listener,
-                [this](auto res) { this->uploadCallback(res); }
-            );
-        }
-        else {
-            auto err = *res.err();
-            geode::log::debug("Error: {}", err);
-            m_login_button->setEnabled(true);
-        }
-        
-    }
-    
-    void uploadCallback(geode::Result<int, string> res) {
-        if (res.isOk()) {
-            auto level_id = *res.ok();
-            geode::log::debug("Uploaded to ID {}", level_id);
-        }
-        else {
-            auto err = *res.err();
-            geode::log::debug("Error: {}", err);
-        }
-        m_login_button->setEnabled(true);
-    }*/
     
 public:
     static FancyExportLayer* create(GJGameLevel const* level) {
         
         auto ret = new FancyExportLayer();
-        if (ret->initAnchored(400.f, 240.f, level, "square-sunset.png"_spr)) {
+        if (ret->initAnchored(420.f, 240.f, level, "square-sunset.png"_spr)) {
             ret->autorelease();
             return ret;
         }
