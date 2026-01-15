@@ -43,9 +43,9 @@ protected:
     CCMenuItemSpriteExtra* m_login_button = nullptr;
     
     // whatever the fuck geode::Popup<...> does here fucks up touch prio. so we just don't do that
-    void registerWithTouchDispatcher() override {
-        FLAlertLayer::registerWithTouchDispatcher();
-    }
+    //void registerWithTouchDispatcher() override {
+    //    FLAlertLayer::registerWithTouchDispatcher();
+    //}
     
     bool setup(GJGameLevel const* level) override;
     
@@ -68,6 +68,26 @@ protected:
     
     void onUnfixUncolored3DToggle(cocos2d::CCObject*) {
         m_processing_options.unfix_uncolored_3d = !m_processing_options.unfix_uncolored_3d;
+    }
+    
+    void onFixLayersInfo(cocos2d::CCObject*) {
+        
+    }
+    
+    void onFixWhiteInfo(cocos2d::CCObject*) {
+        
+    }
+    
+    void onFixWavyBlocksInfo(cocos2d::CCObject*) {
+        
+    }
+    
+    void onUnfixGlowInfo(cocos2d::CCObject*) {
+        
+    }
+    
+    void onUnfixUncolored3DInfo(cocos2d::CCObject*) {
+        
     }
     /*
     void onLoginButton(cocos2d::CCObject*) {
