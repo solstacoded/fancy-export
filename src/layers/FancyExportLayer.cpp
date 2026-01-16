@@ -17,8 +17,10 @@
 #define OPTIONS_GAP 16.0f
 
 #define TEXT_LABEL_HEIGHT 12.0f
-#define EXPORT_TEXTBOX_GAP 4.0f
-#define EXPORT_UPLOAD_GAP (12.0f - EXPORT_TEXTBOX_GAP)
+#define EXPORT_TEXTBOX_GAP 3.0f
+#define EXPORT_UPLOAD_GAP (8.0f - EXPORT_TEXTBOX_GAP)
+
+#define THROBBER_SIZE 12.0f
 
 
 void FancyExportLayer::addOption(ProcessingOption option) {
@@ -165,10 +167,10 @@ bool FancyExportLayer::setup(GJGameLevel const* level) {
             ->setGap(5.0f)
     );
     auto upload_button_sprite = ButtonSprite::create("Upload", "goldFont.fnt", "button-dusk.png"_spr, 0.6f);
-    auto upload_button = CCMenuItemSpriteExtra::create(
+    m_upload_button = CCMenuItemSpriteExtra::create(
         upload_button_sprite, this, menu_selector(FancyExportLayer::onUploadButton)
     );
-    upload_button->setLayoutOptions(
+    m_upload_button->setLayoutOptions(
         geode::AxisLayoutOptions::create()
             ->setNextGap(16.0f)
     );
@@ -176,7 +178,15 @@ bool FancyExportLayer::setup(GJGameLevel const* level) {
     
     auto unlisted_label = cocos2d::CCLabelBMFont::create("Unlisted", "bigFont.fnt");
     unlisted_label->setScale(0.4f);
-    upload_menu->addChild(upload_button);
+    // no
+    if (!m_level->m_isVerified) {
+        m_unlisted_toggle->toggle(true);
+        m_unlisted_toggle->setEnabled(false);
+        m_unlisted_toggle->setCascadeColorEnabled(true);
+        m_unlisted_toggle->setColor(cocos2d::ccc3(150, 150, 150));
+        unlisted_label->setColor(cocos2d::ccc3(150, 150, 150));
+    }
+    upload_menu->addChild(m_upload_button);
     upload_menu->addChild(m_unlisted_toggle);
     upload_menu->addChild(unlisted_label);
     upload_menu->setContentSize(ccp(EXPORT_LAYER_WIDTH, 0.0f));
@@ -186,6 +196,34 @@ bool FancyExportLayer::setup(GJGameLevel const* level) {
         upload_menu, geode::Anchor::Top,
         ccp(0.0f, -(0.5*upload_menu->getContentSize().height + 3*prev_text_inputs + EXPORT_UPLOAD_GAP))
     );
+    
+    m_upload_info_layer = cocos2d::CCLayer::create();
+    m_upload_info_layer->setLayout(
+        geode::RowLayout::create()
+            ->setAutoScale(false)
+            ->setAxisAlignment(geode::AxisAlignment::Start)
+            ->setCrossAxisOverflow(true)
+            ->setGap(6.0f)
+    );
+    m_upload_info_layer->getLayout()->ignoreInvisibleChildren(true);
+    m_upload_throbber = geode::LoadingSpinner::create(THROBBER_SIZE);
+    m_upload_message = cocos2d::CCLabelBMFont::create("She fancy on my export til i", "bigFont.fnt");
+    m_upload_message->setScale(0.3f);
+    
+    m_upload_info_layer->addChild(m_upload_throbber);
+    m_upload_info_layer->addChild(m_upload_message);
+    m_upload_info_layer->setContentSize(ccp(EXPORT_LAYER_WIDTH, 0.0f));
+    m_upload_info_layer->updateLayout();
+    m_upload_info_layer->ignoreAnchorPointForPosition(false);
+    
+    auto upload_message_offset = (upload_menu->getContentSize().height + 3*prev_text_inputs + EXPORT_UPLOAD_GAP);
+    
+    m_export_layer->addChildAtPosition(
+        m_upload_info_layer, geode::Anchor::Top,
+        ccp(0.0f, -(0.5*m_upload_info_layer->getContentSize().height + upload_message_offset + 8.0f))
+    );
+    m_upload_throbber->setVisible(false);
+    m_upload_info_layer->updateLayout();
     
     m_export_layer->updateLayout();
     m_mainLayer->addChildAtPosition(
@@ -197,4 +235,8 @@ bool FancyExportLayer::setup(GJGameLevel const* level) {
     setCloseButtonSpr(close_sprite, 0.8f);
     
     return true;
+}
+
+void FancyExportLayer::onUploadButton(cocos2d::CCObject*) {
+    
 }

@@ -163,7 +163,7 @@ void server::attempt_login(
 
 void server::attempt_upload_level(
     GJGameLevel const* level, string const name, string const& level_string,
-    server::AccountLogin const& login,
+    server::AccountLogin const& login, bool unlisted,
     geode::EventListener<geode::utils::web::WebTask>& listener,
     std::function<void(geode::Result<int, string>)> callback
 ) {
@@ -189,7 +189,7 @@ void server::attempt_upload_level(
         + key_val("objects", std::to_string(level->m_objectCount))
         + key_val("coins", "0")
         + key_val("requestedStars", "0")
-        + key_val("unlisted", "1")
+        + key_val("unlisted", unlisted ? "1" : "0")
         + key_val("ldm", "0")
         + key_val("levelString", level_string)
         + key_val("seed2", level_seed)

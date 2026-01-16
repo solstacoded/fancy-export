@@ -24,7 +24,7 @@ namespace server {
     
     void attempt_upload_level(
         GJGameLevel const* level, string const name, string const& level_string,
-        AccountLogin const& login,
+        AccountLogin const& login, bool unlisted,
         geode::EventListener<geode::utils::web::WebTask>& listener,
         std::function<void(geode::Result<int, string>)> callback
     );

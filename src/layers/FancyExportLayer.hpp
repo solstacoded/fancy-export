@@ -44,12 +44,18 @@ protected:
     
     cocos2d::CCLayer* m_options_layer = nullptr;
     cocos2d::CCLayer* m_export_layer = nullptr;
+    cocos2d::CCLayer* m_upload_info_layer = nullptr;
     
     geode::TextInput* m_username_input = nullptr;
     geode::TextInput* m_password_input = nullptr;
     geode::TextInput* m_level_name_input = nullptr;
     CCMenuItemSpriteExtra* m_login_button = nullptr;
+    CCMenuItemSpriteExtra* m_upload_button = nullptr;
     CCMenuItemToggler* m_unlisted_toggle = nullptr;
+    
+    geode::LoadingSpinner* m_upload_throbber;
+    cocos2d::CCLabelBMFont* m_upload_message;
+    
     
     bool setup(GJGameLevel const* level) override;
     
@@ -90,7 +96,7 @@ protected:
         OptionInfoLayer::create(option)->show();
     }
     
-    void onUploadButton(cocos2d::CCObject*) {}
+    void onUploadButton(cocos2d::CCObject*);
     
 public:
     static FancyExportLayer* create(GJGameLevel const* level) {
