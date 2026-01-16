@@ -10,9 +10,10 @@
 	 - [x] visual bugs
 	 - [x] white fix
  - [x] make a ui that doesn't suck balls
- - [ ] make the ui functional
+ - [x] make the ui functional
 
 ## Future:
+ - [ ] change song option
  - [ ] add images for the help boxes
  - [ ] add a text renderer that doesn't suck for the help boxes
  - [ ] reimplement glow dot merging
