@@ -6,14 +6,16 @@
 #include "../layers/OptionInfoLayer.hpp"
 #include "../classes/Popup.hpp"
 
+using std::string;
+
 struct ProcessingOptions {
-    bool fix_layers = false;
-    bool fix_white = false;
-    bool fix_wavy_blocks = false;
-    bool unfix_uncolored_3d = false;
-    bool unfix_glow = false;
+    bool fix_layers;
+    bool fix_white;
+    bool fix_wavy_blocks;
+    bool unfix_uncolored_3d;
+    bool unfix_glow;
     
-    bool operator==(ProcessingOptions const& other) {
+    bool operator==(ProcessingOptions const& other) const {
         return (
             fix_layers == other.fix_layers
             && fix_white == other.fix_white
@@ -23,6 +25,8 @@ struct ProcessingOptions {
         );
     }
 };
+
+static const ProcessingOptions ALL_OPTIONS_OFF = { false, false, false, false, false };
 
 enum ProcessingOption {
     FixLayers = 0,
@@ -35,10 +39,10 @@ enum ProcessingOption {
 class FancyExportLayer : public not_geode::Popup<GJGameLevel const*> {
 protected:
     GJGameLevel const* m_level = nullptr;
-    std::string m_level_string;
-    ProcessingOptions m_options_cache;
+    string m_level_string;
+    ProcessingOptions m_options_cache = ALL_OPTIONS_OFF;
     
-    ProcessingOptions m_processing_options;
+    ProcessingOptions m_processing_options = ALL_OPTIONS_OFF;
     
     geode::EventListener<geode::utils::web::WebTask> m_listener;
     
@@ -98,8 +102,10 @@ protected:
         OptionInfoLayer::create(option)->show();
     }
     
+    void updateLevelString();
+    
     void setMenusEnabled(bool new_state);
-    void setUploadMessage(std::string const& message, bool enableThrobber=false, std::optional<cocos2d::ccColor3B> colorPulse=std::nullopt);
+    void setUploadMessage(string const& message, bool enableThrobber=false, std::optional<cocos2d::ccColor3B> colorPulse=std::nullopt);
     
     void onUploadButton(cocos2d::CCObject*);
     void onLoginResult(geode::Result<server::AccountLogin, string> res);

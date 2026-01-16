@@ -2,6 +2,12 @@
 
 #include <Geode/Geode.hpp>
 
+#include "../server.hpp"
+#include "../classes/LevelObject.hpp"
+#include "../classes/ObjectHelper.hpp"
+
+using std::string;
+
 #define WINDOW_WIDTH 420.0f
 #define WINDOW_HEIGHT 240.0f
 #define SIDE_PADDING 10.0f
@@ -90,6 +96,7 @@ bool FancyExportLayer::setup(GJGameLevel const* level) {
         return false;
     }
     m_level = level;
+    m_level_string = m_level->m_levelString;
     this->setTitle("Fancy Export");
     
     // == left hand side - options such as layer fixing
@@ -146,6 +153,7 @@ bool FancyExportLayer::setup(GJGameLevel const* level) {
     m_password_input->setLabel("2.2 Password");
     m_password_input->setCommonFilter(geode::CommonFilter::Any);
     m_password_input->setMaxCharCount(20);
+    m_password_input->setPasswordMode(true);
     
     m_export_layer->addChildAtPosition(
         m_password_input, geode::Anchor::Top,
@@ -246,6 +254,48 @@ bool FancyExportLayer::setup(GJGameLevel const* level) {
     return true;
 }
 
+void FancyExportLayer::updateLevelString() {
+    if (m_options_cache == m_processing_options) { return; }
+    
+    m_options_cache = m_processing_options;
+    
+    if (m_processing_options == ALL_OPTIONS_OFF) {
+        m_level_string = m_level->m_levelString;
+        geode::log::debug("All options off");
+        return;
+    }
+    
+    geode::log::debug("fix_layers: {}", m_processing_options.fix_layers);
+    geode::log::debug("fix_white: {}", m_processing_options.fix_white);
+    geode::log::debug("fix_wavy_blocks: {}", m_processing_options.fix_wavy_blocks);
+    geode::log::debug("unfix_glow: {}", m_processing_options.unfix_glow);
+    geode::log::debug("unfix_uncolored_3d: {}", m_processing_options.unfix_uncolored_3d);
+    
+    auto objects = LevelObject::from_level_string(m_level->m_levelString);
+    
+    auto helper = obj_helper::getSharedHelper();
+    
+    for (int i = 1; i < objects.size(); i++) {
+        if (m_processing_options.fix_layers) {
+            objects[i].fix_layers(helper);
+        }
+        if (m_processing_options.fix_white) {
+            objects[i].fix_white(helper);
+        }
+        if (m_processing_options.fix_wavy_blocks) {
+            objects[i].fix_wavy_blocks();
+        }
+        if (m_processing_options.unfix_glow) {
+            objects[i].unfix_glow();
+        }
+        if (m_processing_options.unfix_uncolored_3d) {
+            objects[i].unfix_uncolored_3d();
+        }
+    }
+    
+    m_level_string = LevelObject::to_level_string(objects);
+}
+
 
 void FancyExportLayer::setMenusEnabled(bool new_state) {
     if (new_state == m_menus_enabled) { return; }
@@ -285,7 +335,7 @@ void FancyExportLayer::setMenusEnabled(bool new_state) {
 }
 
 
-void FancyExportLayer::setUploadMessage(std::string const& message, bool enableThrobber, std::optional<cocos2d::ccColor3B> colorPulse) {
+void FancyExportLayer::setUploadMessage(string const& message, bool enableThrobber, std::optional<cocos2d::ccColor3B> colorPulse) {
     m_upload_throbber->setVisible(enableThrobber);
     m_upload_message->setText(message);
     auto max_width = enableThrobber ?
@@ -318,4 +368,56 @@ void FancyExportLayer::onUploadButton(cocos2d::CCObject*) {
         setUploadMessage("Password must be at least 6 characters", false, cocos2d::ccRED);
         return;
     }
+    
+    server::attempt_login(
+        username, password,
+        m_listener,
+        [this](auto res) { this->onLoginResult(res); }
+    );
+    setUploadMessage("Logging in...", true);
+    setMenusEnabled(false);
+}
+
+
+void FancyExportLayer::onLoginResult(geode::Result<server::AccountLogin, string> res) {
+    if (res.isOk()) {
+        // causes a big lagspike with high object levels. will move to a different thread in a future update
+        updateLevelString();
+        
+        auto level_name = m_level_name_input->getString();
+        auto unlisted = m_unlisted_toggle->m_toggled;
+        
+        server::attempt_upload_level(
+            m_level, level_name, m_level_string,
+            res.unwrap(), unlisted,
+            m_listener,
+            [this](auto res) { this->onUploadResult(res); }
+        );
+        setUploadMessage("Uploading level...", true);
+    }
+    else {
+        setUploadMessage(
+            std::format("Login failed: {}", res.unwrapErr()),
+            false, cocos2d::ccRED
+        );
+        setMenusEnabled(true);
+    }
+}
+
+
+void FancyExportLayer::onUploadResult(geode::Result<int, string> res) {
+    if (res.isOk()) {
+        setUploadMessage(
+            std::format("Successfully uploaded level to 2.2! ({})", res.unwrap()),
+            false, cocos2d::ccGREEN
+        );
+    }
+    else {
+        setUploadMessage(
+            std::format("Login failed: {}", res.unwrapErr()),
+            false, cocos2d::ccRED
+        );
+    }
+    
+    setMenusEnabled(true);
 }
