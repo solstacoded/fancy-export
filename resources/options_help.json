@@ -1,0 +1,23 @@
+{
+    "fix_layers": [
+        "2.2 layers objects very differently to 1.9.",
+        "\nThis option sets every object to its 1.9 Z layer and Z order to make layering as close to 1.9 as possible.",
+        "\nNote that exact parity is impossible because some objects (portals and speed changers) have hardcoded Z layers in 2.2."
+    ],
+    "fix_white": [
+        "Objects in 1.9 can be made white by setting them to an unused color ID.",
+        "2.2 doesn't understand this and uses the default color.\nThis option manually sets these objects to the 2.1 white channel."
+    ],
+    "fix_wavy_blocks": [
+        "2.2 has a weird bug where certain objects don't render properly when their color is set to pure black.",
+        "\nThis option sets HSV brightness to +0.02 on these objects to prevent this."
+    ],
+    "unfix_glow": [
+        "2.1 added glow sprites to a few objects that didn't have them in 1.9.",
+        "\nThis option disables glow on these objects."
+    ],
+    "unfix_uncolored_3d": [
+        "Two sets of 3D blocks had no color channel assigned to them in 1.9, and always displayed as uncolored.",
+        "They were changed to the Obj channel in a later update. \nThis option makes them uncolored again."
+    ]
+}

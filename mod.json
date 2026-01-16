@@ -22,7 +22,7 @@
             ]
         },
         "files": [
-            "resources/obj_data.json"
+            "resources/*.json"
         ]
     }
 }

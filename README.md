@@ -13,6 +13,8 @@
  - [ ] make the ui functional
 
 ## Future:
+ - [ ] add images for the help boxes
+ - [ ] add a text renderer that doesn't suck for the help boxes
  - [ ] reimplement glow dot merging
  - [ ] .gmd exporting
  - [ ] MAYBE: hitbox fixing (easier to do with geode mods)
