@@ -49,13 +49,15 @@ protected:
     geode::TextInput* m_username_input = nullptr;
     geode::TextInput* m_password_input = nullptr;
     geode::TextInput* m_level_name_input = nullptr;
-    CCMenuItemSpriteExtra* m_login_button = nullptr;
     CCMenuItemSpriteExtra* m_upload_button = nullptr;
     CCMenuItemToggler* m_unlisted_toggle = nullptr;
     
     geode::LoadingSpinner* m_upload_throbber;
-    cocos2d::CCLabelBMFont* m_upload_message;
+    geode::SimpleTextArea* m_upload_message;
+    cocos2d::CCLabelBMFont* m_unlisted_label;
     
+    bool m_menus_enabled = true;
+    bool m_force_unlisted = false;
     
     bool setup(GJGameLevel const* level) override;
     
@@ -96,7 +98,12 @@ protected:
         OptionInfoLayer::create(option)->show();
     }
     
+    void setMenusEnabled(bool new_state);
+    void setUploadMessage(std::string const& message, bool enableThrobber=false, std::optional<cocos2d::ccColor3B> colorPulse=std::nullopt);
+    
     void onUploadButton(cocos2d::CCObject*);
+    void onLoginResult(geode::Result<server::AccountLogin, string> res);
+    void onUploadResult(geode::Result<int, string> res);
     
 public:
     static FancyExportLayer* create(GJGameLevel const* level) {

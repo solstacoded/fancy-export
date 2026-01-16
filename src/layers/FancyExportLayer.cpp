@@ -21,6 +21,7 @@
 #define EXPORT_UPLOAD_GAP (8.0f - EXPORT_TEXTBOX_GAP)
 
 #define THROBBER_SIZE 12.0f
+#define UPLOAD_INFO_GAP 6.0f
 
 
 void FancyExportLayer::addOption(ProcessingOption option) {
@@ -45,6 +46,7 @@ void FancyExportLayer::addOption(ProcessingOption option) {
     auto checkbox = CCMenuItemToggler::createWithStandardSprites(
         this, menu_selector(FancyExportLayer::onOptionsToggle), 0.6f
     );
+    checkbox->setCascadeOpacityEnabled(true);
     checkbox->setTag(static_cast<int>(option));
     auto info_button_sprite = cocos2d::CCSprite::createWithSpriteFrameName("GJ_infoIcon_001.png");
     info_button_sprite->setScale(0.5f);
@@ -52,6 +54,10 @@ void FancyExportLayer::addOption(ProcessingOption option) {
         info_button_sprite, this, menu_selector(FancyExportLayer::onOptionsInfo)
     );
     info_button->setTag(static_cast<int>(option));
+    info_button->setLayoutOptions(
+        geode::AxisLayoutOptions::create()
+            ->setCrossAxisAlignment(geode::AxisAlignment::End)
+    );
     
     auto used_space = checkbox->getContentSize().width
         + info_button->getContentSize().width
@@ -73,6 +79,7 @@ void FancyExportLayer::addOption(ProcessingOption option) {
     menu->addChild(info_button);
     menu->addChild(checkbox);
     menu->addChild(label);
+    menu->setCascadeOpacityEnabled(true);
     menu->updateLayout();
     m_options_layer->addChild(menu);
 }
@@ -167,6 +174,7 @@ bool FancyExportLayer::setup(GJGameLevel const* level) {
             ->setGap(5.0f)
     );
     auto upload_button_sprite = ButtonSprite::create("Upload", "goldFont.fnt", "button-dusk.png"_spr, 0.6f);
+    upload_button_sprite->setCascadeOpacityEnabled(true);
     m_upload_button = CCMenuItemSpriteExtra::create(
         upload_button_sprite, this, menu_selector(FancyExportLayer::onUploadButton)
     );
@@ -175,20 +183,21 @@ bool FancyExportLayer::setup(GJGameLevel const* level) {
             ->setNextGap(16.0f)
     );
     m_unlisted_toggle = CCMenuItemToggler::createWithStandardSprites(this, nullptr, 0.6f);
+    m_unlisted_toggle->setCascadeOpacityEnabled(true);
     
-    auto unlisted_label = cocos2d::CCLabelBMFont::create("Unlisted", "bigFont.fnt");
-    unlisted_label->setScale(0.4f);
+    m_unlisted_label = cocos2d::CCLabelBMFont::create("Unlisted", "bigFont.fnt");
+    m_unlisted_label->setScale(0.4f);
     // no
     if (!m_level->m_isVerified) {
         m_unlisted_toggle->toggle(true);
         m_unlisted_toggle->setEnabled(false);
-        m_unlisted_toggle->setCascadeColorEnabled(true);
-        m_unlisted_toggle->setColor(cocos2d::ccc3(150, 150, 150));
-        unlisted_label->setColor(cocos2d::ccc3(150, 150, 150));
+        m_unlisted_toggle->setOpacity(150);
+        m_unlisted_label->setOpacity(150);
+        m_force_unlisted = true;
     }
     upload_menu->addChild(m_upload_button);
     upload_menu->addChild(m_unlisted_toggle);
-    upload_menu->addChild(unlisted_label);
+    upload_menu->addChild(m_unlisted_label);
     upload_menu->setContentSize(ccp(EXPORT_LAYER_WIDTH, 0.0f));
     upload_menu->updateLayout();
     
@@ -203,12 +212,12 @@ bool FancyExportLayer::setup(GJGameLevel const* level) {
             ->setAutoScale(false)
             ->setAxisAlignment(geode::AxisAlignment::Start)
             ->setCrossAxisOverflow(true)
-            ->setGap(6.0f)
+            ->setGap(UPLOAD_INFO_GAP)
     );
     m_upload_info_layer->getLayout()->ignoreInvisibleChildren(true);
     m_upload_throbber = geode::LoadingSpinner::create(THROBBER_SIZE);
-    m_upload_message = cocos2d::CCLabelBMFont::create("She fancy on my export til i", "bigFont.fnt");
-    m_upload_message->setScale(0.3f);
+    m_upload_message = geode::SimpleTextArea::create("Hello there", "bigFont.fnt", 0.25f);
+    m_upload_message->setWrappingMode(geode::WrappingMode::SPACE_WRAP);
     
     m_upload_info_layer->addChild(m_upload_throbber);
     m_upload_info_layer->addChild(m_upload_message);
@@ -220,10 +229,8 @@ bool FancyExportLayer::setup(GJGameLevel const* level) {
     
     m_export_layer->addChildAtPosition(
         m_upload_info_layer, geode::Anchor::Top,
-        ccp(0.0f, -(0.5*m_upload_info_layer->getContentSize().height + upload_message_offset + 8.0f))
+        ccp(0.0f, -(0.5*m_upload_throbber->getContentSize().height + upload_message_offset + 8.0f))
     );
-    m_upload_throbber->setVisible(false);
-    m_upload_info_layer->updateLayout();
     
     m_export_layer->updateLayout();
     m_mainLayer->addChildAtPosition(
@@ -234,9 +241,81 @@ bool FancyExportLayer::setup(GJGameLevel const* level) {
     auto close_sprite = cocos2d::CCSprite::createWithSpriteFrameName("close-button-dusk.png"_spr);
     setCloseButtonSpr(close_sprite, 0.8f);
     
+    setUploadMessage("");
+    
     return true;
 }
 
-void FancyExportLayer::onUploadButton(cocos2d::CCObject*) {
+
+void FancyExportLayer::setMenusEnabled(bool new_state) {
+    if (new_state == m_menus_enabled) { return; }
     
+    unsigned char opacity = new_state ? 255 : 150;
+    
+    if (new_state) {
+        // forceprio gets set to false when we open and close an info box.
+        // this makes textinputs use a prio of 500 which is not good for us.
+        // instead of figuring out how to make info boxes not do that we just
+        // ensure forceprio is enabled here. hacky fix but it works
+        auto td = cocos2d::CCTouchDispatcher::get();
+        td->setForcePrio(true);
+    }
+    
+    m_username_input->setEnabled(new_state);
+    m_password_input->setEnabled(new_state);
+    m_level_name_input->setEnabled(new_state);
+    m_upload_button->setEnabled(new_state);
+    static_cast<cocos2d::CCNodeRGBA*>(
+        m_upload_button->getNormalImage()
+    )->setOpacity(opacity);
+    
+    for (int i = 0; i < m_options_layer->getChildrenCount(); i++) {
+        auto option = m_options_layer->getChildByIndex<cocos2d::CCMenu>(i);
+        option->setEnabled(new_state);
+        option->setOpacity(opacity);
+    }
+    
+    if (!m_force_unlisted) {
+        m_unlisted_toggle->setEnabled(new_state);
+        m_unlisted_toggle->setOpacity(opacity);
+        m_unlisted_label->setOpacity(opacity);
+    }
+    
+    m_menus_enabled = new_state;
+}
+
+
+void FancyExportLayer::setUploadMessage(std::string const& message, bool enableThrobber, std::optional<cocos2d::ccColor3B> colorPulse) {
+    m_upload_throbber->setVisible(enableThrobber);
+    m_upload_message->setText(message);
+    auto max_width = enableThrobber ?
+        (EXPORT_LAYER_WIDTH - UPLOAD_INFO_GAP - THROBBER_SIZE) : EXPORT_LAYER_WIDTH;
+    m_upload_message->setWidth(max_width);
+    
+    m_upload_info_layer->updateLayout();
+    
+    if (colorPulse.has_value()) {
+        auto lines = m_upload_message->getLines();
+        for (auto it = lines.begin(); it != lines.end(); it++) {
+            auto line = *it;
+            line->setColor(*colorPulse);
+            line->runAction(
+                cocos2d::CCTintTo::create(0.5f, 255, 255, 255)
+            );
+        }
+    }
+}
+
+
+void FancyExportLayer::onUploadButton(cocos2d::CCObject*) {
+    auto username = m_username_input->getString();
+    if (username.length() < 3) {
+        setUploadMessage("Username must be at least 3 characters", false, cocos2d::ccRED);
+        return;
+    }
+    auto password = m_password_input->getString();
+    if (password.length() < 6) {
+        setUploadMessage("Password must be at least 6 characters", false, cocos2d::ccRED);
+        return;
+    }
 }
