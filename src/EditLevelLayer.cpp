@@ -1,8 +1,8 @@
-#pragma once
-
 #include <Geode/Geode.hpp>
 
 #include "layers/FancyExportLayer.hpp"
+
+static bool s_spin = false;
 
 #include <Geode/modify/EditLevelLayer.hpp>
 class $modify(FancyEditLevelLayer, EditLevelLayer) {
@@ -31,11 +31,13 @@ class $modify(FancyEditLevelLayer, EditLevelLayer) {
         auto angle = 360.0f * static_cast<float>(std::rand()) / static_cast<float>(RAND_MAX);
         inner_sprite->setRotation(angle);
         
-        if ((std::rand() & 0x7f) == 0) {
+        auto spin_mask = s_spin ? 0x0f : 0x7f;
+        if ((std::rand() & spin_mask) == 0) {
             auto rotate_action = cocos2d::CCRepeatForever::create(
                 cocos2d::CCRotateBy::create(1.0, 10.0)
             );
             inner_sprite->runAction(rotate_action);
+            s_spin = true;
         }
         
         auto button = CCMenuItemSpriteExtra::create(
