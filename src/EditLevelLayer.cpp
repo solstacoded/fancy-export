@@ -31,7 +31,7 @@ class $modify(FancyEditLevelLayer, EditLevelLayer) {
         auto angle = 360.0f * static_cast<float>(std::rand()) / static_cast<float>(RAND_MAX);
         inner_sprite->setRotation(angle);
         
-        if (std::rand() & 0x7f == 0) {
+        if ((std::rand() & 0x7f) == 0) {
             auto rotate_action = cocos2d::CCRepeatForever::create(
                 cocos2d::CCRotateBy::create(1.0, 10.0)
             );
