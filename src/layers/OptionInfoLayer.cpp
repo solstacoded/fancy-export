@@ -46,29 +46,37 @@ std::unordered_map<string, string> const& get_help_strings() {
 }
 
 bool OptionInfoLayer::setup(ProcessingOption option) {
-    auto image = cocos2d::CCSprite::createWithSpriteFrameName("jam.png"_spr);
     
     string info_key;
+    char const* image_path;
     switch (option) {
     case ProcessingOption::FixLayers:
         info_key = "fix_layers";
+        image_path = "fix_layers.png"_spr;
         break;
     case ProcessingOption::FixWhite:
         info_key = "fix_white";
+        image_path = "fix_white.png"_spr;
         break;
     case ProcessingOption::FixWavyBlocks:
         info_key = "fix_wavy_blocks";
+        image_path = "fix_wavy_blocks.png"_spr;
         break;
     case ProcessingOption::UnfixGlow:
         info_key = "unfix_glow";
+        image_path = "unfix_glow.png"_spr;
         break;
     case ProcessingOption::UnfixUncolored3D:
         info_key = "unfix_uncolored_3d";
+        image_path = "unfix_uncolored_3d.png"_spr;
         break;
     default:
         info_key = "";
+        image_path = "jam.png"_spr;
         break;
     }
+    
+    auto image = cocos2d::CCSprite::createWithSpriteFrameName(image_path);
     
     auto help_strings = get_help_strings();
     string info_string;

@@ -9,7 +9,7 @@
         "2.2 doesn't understand this and uses the default color.\nThis option manually sets these objects to the 2.1 white channel."
     ],
     "fix_wavy_blocks": [
-        "2.2 has a weird bug where certain objects don't render properly when their color is set to pure black.",
+        "2.2 has a weird bug where specifically these wavy blocks don't render properly when their color is set to pure black.",
         "\nThis option sets HSV brightness to +0.02 on these objects to prevent this."
     ],
     "unfix_glow": [
