@@ -118,9 +118,11 @@ bool LevelObject::fix_layers(ObjectHelper const* helper) {
         bottom = obj_data.force_bottom || obj_data.z < 0;
         break;
     }
+    auto true_z = obj_data.color_child_only ? obj_data.z - 1 : obj_data.z;
+    
     inner.insert_or_assign(
         Key::ZOrder,
-        std::to_string(obj_data.z)
+        std::to_string(true_z)
     );
     inner.insert_or_assign(
         Key::ZLayer,

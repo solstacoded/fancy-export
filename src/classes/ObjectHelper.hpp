@@ -10,6 +10,7 @@ namespace obj_helper {
         int8_t z;
         bool has_child;
         bool has_color_child;
+        bool color_child_only;
         bool force_bottom;
         bool secondary;
     };

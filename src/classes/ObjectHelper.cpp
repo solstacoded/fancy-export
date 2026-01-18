@@ -32,6 +32,7 @@ bool ObjectHelper::initObjData() {
             static_cast<int8_t>(data["z"].asInt().unwrapOr(0)),
             data["has_child"].asBool().unwrapOr(false),
             data["has_color_child"].asBool().unwrapOr(false),
+            data["color_child_only"].asBool().unwrapOr(false),
             data["force_bottom"].asBool().unwrapOr(false),
             data["secondary"].asBool().unwrapOr(false)
         };
