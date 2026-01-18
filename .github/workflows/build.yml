@@ -1,0 +1,70 @@
+name: Build Projects
+
+on:
+  pull_request:
+  push:
+    branches:
+    - "**"
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup Geode CLI
+      uses: geode-sdk/cli/.github/actions/setup@main
+      with:
+        version: "latest"
+
+    - uses: actions/checkout@v4
+      with:
+        repository: "qimiko/geode"
+        ref: "gdps"
+        path: ${{ github.workspace }}/geode-sdk-clone
+
+    - uses: robinraju/release-downloader@v1
+      with:
+        repository: "qimiko/geode"
+        tag: "nightly"
+        fileName: "geode-*-+(win|android32).zip"
+        out-file-path: "${{ github.workspace }}/geode-sdk-clone/bin/nightly"
+        extract: true
+
+    - name: Load CPM cache
+      id: cache-cpm
+      uses: actions/cache@v3
+      with:
+        path: ~/cpm-cache
+        key: ${{ runner.os }}-cpm-${{ hashFiles('**/') }}
+        restore-keys: |
+          ${{ runner.os }}-cpm-
+    
+    - name: Build Windows
+      shell: bash
+      run: |
+        cmake -B build-windows -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_CXX_FLAGS=-m32 -DCMAKE_C_FLAGS=-m32 -G Ninja -DGEODE_DONT_INSTALL_MODS=ON -DCMAKE_BUILD_TYPE=RelWithDebInfo
+        cmake --build build-windows
+      env:
+        GEODE_SDK: ${{ github.workspace }}/geode-sdk-clone
+        CPM_SOURCE_CACHE: ~/cpm-cache
+    
+    - name: Build Android
+      shell: bash
+      run: geode build -p android32
+      env:
+        GEODE_SDK: ${{ github.workspace }}/geode-sdk-clone
+        CPM_SOURCE_CACHE: ~/cpm-cache
+    
+    - name: Merge packages
+      shell: bash
+      run: |
+        geode package merge "${GITHUB_WORKSPACE}/build-windows/solstacoded.fancy-export.geode" "${GITHUB_WORKSPACE}/build-android32/solstacoded.fancy-export.geode"
+        
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: build-results
+        path: ${{ github.workspace }}/build-windows/solstacoded.fancy-export.geode
