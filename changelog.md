@@ -1,3 +1,7 @@
+# <cg>1.0.1</c> (18 january 2026)
+- fixed layering mistake related to colour children
+- added images to infoboxes
+
 # <cg>1.0.0</c> (17 january 2026)
 - initial version.
 - added the following features:
