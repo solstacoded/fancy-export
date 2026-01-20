@@ -25,6 +25,7 @@ public:
     
     void updateTextDisplay();
     
+    void limitLabelHeight(float height, float defaultScale, float minScale);
 protected:
     std::string m_font;
     std::string m_text;

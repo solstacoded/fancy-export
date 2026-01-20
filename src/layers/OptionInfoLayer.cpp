@@ -32,9 +32,6 @@ std::unordered_map<string, string> const& get_help_strings() {
             auto pair = *it;
             std::ostringstream os;
             for (int i = 0; i < pair.second.size(); i++) {
-                if (i != 0) {
-                    os << ' ';
-                }
                 os << pair.second[i];
             }
             joined_map.insert_or_assign(pair.first, os.str());
