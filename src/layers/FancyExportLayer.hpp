@@ -6,6 +6,7 @@
 #include "../layers/OptionInfoLayer.hpp"
 #include "../classes/Popup.hpp"
 #include "../classes/UnpackedLevel.hpp"
+#include "../classes/TextArea.hpp"
 
 using std::string;
 
@@ -30,7 +31,7 @@ protected:
     CCMenuItemToggler* m_unlisted_toggle = nullptr;
     
     geode::LoadingSpinner* m_upload_throbber;
-    geode::SimpleTextArea* m_upload_message;
+    SolstaTextArea* m_upload_message;
     cocos2d::CCLabelBMFont* m_unlisted_label;
     
     bool m_menus_enabled = true;

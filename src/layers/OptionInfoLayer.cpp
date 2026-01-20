@@ -3,6 +3,7 @@
 #include <Geode/Geode.hpp>
 
 #include "../layers/FancyExportLayer.hpp"
+#include "../classes/TextArea.hpp"
 
 #define WINDOW_WIDTH 300.0f
 #define WINDOW_HEIGHT 240.0f
@@ -91,31 +92,13 @@ bool OptionInfoLayer::setup(ProcessingOption option) {
     
     auto textbox_offset = TOP_PADDING + image->getContentSize().height + TEXTBOX_GAP;
     
-    auto text = geode::SimpleTextArea::create(info_string, "chatFont.fnt", TEXT_SCALE, TEXTBOX_WIDTH);  
-    text->setWrappingMode(geode::WrappingMode::SPACE_WRAP);
+    auto text = SolstaTextArea::create(info_string, "chatFont.fnt", TEXT_SCALE, TEXTBOX_WIDTH);
+    text->setIsJustified(true);
+    text->setParagraphPadding(4.0f);
+    
     auto max_height = WINDOW_HEIGHT - textbox_offset - BOTTOM_PADDING;
     
-    // doesn't have an auto size, so we just do it the stupid way
-    if (text->getContentSize().height > max_height) {
-        auto is_outside = true;
-        auto base = TEXT_SCALE;
-        auto offset = 0.4f;
-        for (int i = 0; i < 6; i++) {
-            if (is_outside) {
-                base -= offset;
-                text->setScale(base);
-                is_outside = text->getContentSize().height > max_height;
-            }
-            else {
-                text->setScale(base + offset);
-                if (text->getContentSize().height <= max_height) {
-                    base += offset;
-                }
-            }
-            offset *= 0.5f;
-        }
-        text->setScale(base);
-    }
+    text->limitLabelHeight(max_height, TEXT_SCALE, 0.1f);
     
     m_mainLayer->addChildAtPosition(
         text, geode::Anchor::Top,

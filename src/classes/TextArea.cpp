@@ -31,10 +31,14 @@ bool SolstaTextArea::init(const string& text, const string& font, float scale, f
     this->setContentWidth(width);
     this->setAnchorPoint({ 0.5f, 0.5f });
     m_container->setPosition({ 0, 0 });
+    m_container->setCascadeColorEnabled(true);
+    m_container->setCascadeOpacityEnabled(true);
     this->addChild(m_container);
     
     m_container->setLayout(geode::AnchorLayout::create());
     
+    this->setCascadeColorEnabled(true);
+    this->setCascadeOpacityEnabled(true);
     this->updateTextDisplay();
     
     return true;
@@ -117,6 +121,7 @@ bool SolstaTextArea::updateTextDisplay(std::optional<float> maxHeight) {
     auto paragraph_padding = m_paragraphPadding * m_fontScale;
     
     bool bailed = false;
+    // there is some duplicated code here. can't be bothered DRYing it just yet
     for (auto word : words) {
         if (word == "\n") {
             auto next_line_offset = line_offset + line_height + paragraph_padding;
@@ -198,6 +203,41 @@ bool SolstaTextArea::updateTextDisplay(std::optional<float> maxHeight) {
     return true;
 }
 
+#define LIMIT_HEIGHT_ITERATIONS 8
+
+void SolstaTextArea::limitLabelHeight(float height, float defaultScale, float minScale) {
+    this->setFontScale(defaultScale);
+    if (this->updateTextDisplay(height)) {
+        // fits in defaultscale
+        return;
+    }
+    auto scale = defaultScale;
+    auto step = (defaultScale - minScale)*0.5f;
+    int i;
+    bool succeeded;
+    for (i = 0; i < LIMIT_HEIGHT_ITERATIONS; i++) {
+        scale -= step;
+        step *= 0.5f;
+        this->setFontScale(scale);
+        succeeded = this->updateTextDisplay(height);
+        if (succeeded) {
+            i++;
+            break;
+        }
+    }
+    for (auto j = i; j < LIMIT_HEIGHT_ITERATIONS; j++) {
+        this->setFontScale(scale + step);
+        if (this->updateTextDisplay(height)) {
+            scale += step;
+        }
+        step *= 0.5f;
+    }
+    if (!succeeded) {
+        scale = minScale;
+    }
+    this->setFontScale(scale);
+    this->updateTextDisplay();
+}
 
 string const& SolstaTextArea::getFont() {
     return m_font;

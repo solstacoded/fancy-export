@@ -224,8 +224,7 @@ bool FancyExportLayer::setup(GJGameLevel const* level) {
     );
     m_upload_info_layer->getLayout()->ignoreInvisibleChildren(true);
     m_upload_throbber = geode::LoadingSpinner::create(THROBBER_SIZE);
-    m_upload_message = geode::SimpleTextArea::create("Hello there", "bigFont.fnt", 0.25f);
-    m_upload_message->setWrappingMode(geode::WrappingMode::SPACE_WRAP);
+    m_upload_message = SolstaTextArea::create("Hello", "bigFont.fnt", 0.24f);
     
     m_upload_info_layer->addChild(m_upload_throbber);
     m_upload_info_layer->addChild(m_upload_message);
@@ -340,19 +339,16 @@ void FancyExportLayer::setUploadMessage(string const& message, bool enableThrobb
     m_upload_message->setText(message);
     auto max_width = enableThrobber ?
         (EXPORT_LAYER_WIDTH - UPLOAD_INFO_GAP - THROBBER_SIZE) : EXPORT_LAYER_WIDTH;
-    m_upload_message->setWidth(max_width);
+    m_upload_message->setContentWidth(max_width);
+    m_upload_message->updateTextDisplay();
     
     m_upload_info_layer->updateLayout();
     
     if (colorPulse.has_value()) {
-        auto lines = m_upload_message->getLines();
-        for (auto it = lines.begin(); it != lines.end(); it++) {
-            auto line = *it;
-            line->setColor(*colorPulse);
-            line->runAction(
-                cocos2d::CCTintTo::create(0.5f, 255, 255, 255)
-            );
-        }
+        m_upload_message->setColor(*colorPulse);
+        m_upload_message->runAction(
+            cocos2d::CCTintTo::create(0.5f, 255, 255, 255)
+        );
     }
 }
 
