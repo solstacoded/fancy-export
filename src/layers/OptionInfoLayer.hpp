@@ -3,7 +3,7 @@
 #include <Geode/Geode.hpp>
 
 #include "../classes/Popup.hpp"
-#include "../classes/UnpackedLevel.hpp"
+#include "../classes/ProcessingOptions.hpp"
 
 class OptionInfoLayer : public not_geode::Popup<ProcessingOption> {
 protected:

@@ -5,7 +5,7 @@
 #include "../server.hpp"
 #include "../layers/OptionInfoLayer.hpp"
 #include "../classes/Popup.hpp"
-#include "../classes/UnpackedLevel.hpp"
+#include "../classes/ProcessingOptions.hpp"
 #include "../classes/TextArea.hpp"
 
 using std::string;

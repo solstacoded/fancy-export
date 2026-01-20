@@ -31,7 +31,7 @@ refer to [changelog.md](changelog.md)
 
 ## planned technical stuff
 you don't really need to pay attention to this section unless you're coding the mod it's just for my reference
- - [ ] create textarea that doesn't suck
+ - [x] create textarea that doesn't suck
  - [ ] create an actual level object for processing objects
  - [ ] figure out how to tasks and coroutines
  - [ ] rework processingoptions

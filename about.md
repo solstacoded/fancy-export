@@ -20,7 +20,6 @@ if in doubt, [use the python script instead](https://github.com/solstacoded/fanc
     - glow dot merging
     - touch trigger hitbox fix
     - MAYBE: general hitbox fix
-    - add actual images for the processing options infoboxes
 - .
 - <cy>export options</c>
     - gmd export
