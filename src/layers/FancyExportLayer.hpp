@@ -45,28 +45,8 @@ protected:
         auto toggler = static_cast<CCMenuItemToggler*>(sender);
         auto option = static_cast<ProcessingOption>(toggler->getTag());
         
-        switch (option) {
-        case ProcessingOption::FixLayers:
-            m_processing_options.fix_layers = !toggler->m_toggled;
-            geode::log::debug("fix_layers {}", !toggler->m_toggled);
-            break;
-        case ProcessingOption::FixWhite:
-            m_processing_options.fix_white = !toggler->m_toggled;
-            geode::log::debug("fix_white {}", !toggler->m_toggled);
-            break;
-        case ProcessingOption::FixWavyBlocks:
-            m_processing_options.fix_wavy_blocks = !toggler->m_toggled;
-            geode::log::debug("fix_wavy_blocks {}", !toggler->m_toggled);
-            break;
-        case ProcessingOption::UnfixGlow:
-            m_processing_options.unfix_glow = !toggler->m_toggled;
-            geode::log::debug("unfix_glow {}", !toggler->m_toggled);
-            break;
-        case ProcessingOption::UnfixUncolored3D:
-            m_processing_options.unfix_uncolored_3d = !toggler->m_toggled;
-            geode::log::debug("unfix_uncolored_3d {}", !toggler->m_toggled);
-            break;
-        }
+        m_processing_options.setOption(option, !toggler->m_toggled);
+        geode::log::debug("{} {}", ProcessingOptions::getString(option), !toggler->m_toggled);
     }
     
     void onOptionsInfo(cocos2d::CCObject* sender) {

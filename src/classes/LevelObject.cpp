@@ -27,7 +27,7 @@ namespace Key {
 
 const string NEW_WHITE = "1011";
 
-enum Color {
+enum class Color {
     None  = 0,
     P1    = 1,
     P2    = 2,

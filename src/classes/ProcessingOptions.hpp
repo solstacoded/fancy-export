@@ -12,10 +12,10 @@ struct ProcessingOptions {
     bool fix_layers;
     bool fix_white;
     bool fix_wavy_blocks;
-    bool unfix_uncolored_3d;
     bool unfix_glow;
+    bool unfix_uncolored_3d;
     
-    bool operator==(ProcessingOptions const& other) const {
+    constexpr bool operator==(ProcessingOptions const& other) const {
         return (
             fix_layers == other.fix_layers
             && fix_white == other.fix_white
@@ -24,6 +24,12 @@ struct ProcessingOptions {
             && unfix_glow == other.unfix_glow
         );
     }
+    
+    static char const* getString(ProcessingOption);
+    static char const* getDisplayString(ProcessingOption);
+    static char const* getFrameName(ProcessingOption);
+    bool getOption(ProcessingOption);
+    void setOption(ProcessingOption, bool);
 };
 
 static const ProcessingOptions ALL_OPTIONS_OFF = { false, false, false, false, false };

@@ -5,6 +5,7 @@
 #include "../server.hpp"
 #include "../classes/LevelObject.hpp"
 #include "../classes/ObjectHelper.hpp"
+#include "../classes/ProcessingOptions.hpp"
 
 using std::string;
 
@@ -31,24 +32,8 @@ using std::string;
 
 
 void FancyExportLayer::addOption(ProcessingOption option) {
-    char const* label_string;
-    switch (option) {
-    case ProcessingOption::FixLayers:
-        label_string = "Fix Layers";
-        break;
-    case ProcessingOption::FixWhite:
-        label_string = "Fix White Channel";
-        break;
-    case ProcessingOption::FixWavyBlocks:
-        label_string = "Fix Wavy Blocks";
-        break;
-    case ProcessingOption::UnfixGlow:
-        label_string = "Unfix Object Glow";
-        break;
-    case ProcessingOption::UnfixUncolored3D:
-        label_string = "Unfix Uncolored 3D";
-        break;
-    }
+    char const* label_string = ProcessingOptions::getDisplayString(option);
+    
     auto checkbox = CCMenuItemToggler::createWithStandardSprites(
         this, menu_selector(FancyExportLayer::onOptionsToggle), 0.6f
     );
@@ -410,7 +395,7 @@ void FancyExportLayer::onUploadResult(geode::Result<int, string> res) {
     }
     else {
         setUploadMessage(
-            std::format("Login failed: {}", res.unwrapErr()),
+            std::format("Upload failed: {}", res.unwrapErr()),
             false, cocos2d::ccRED
         );
     }
