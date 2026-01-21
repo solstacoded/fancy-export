@@ -4,6 +4,7 @@
 #include <iostream>
 
 #include "../utils/Spliterator.hpp"
+#include "../utils/zip.hpp"
 
 #include "../classes/ObjectHelper.hpp"
 
@@ -47,7 +48,7 @@ struct LevelObject {
         for (auto obj = objects.begin(); obj != objects.end(); obj++) {
             os << *obj;
         }
-        return cocos2d::ZipUtils::compressString(os.str(), false);
+        return gzipBase64(os.str());
     }
     
     bool fix_layers(ObjectHelper const* helper);

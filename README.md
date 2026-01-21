@@ -41,3 +41,4 @@ geode popup code - original by geode team, [modified for 1.9 by zmx](https://git
 button & square assets - original assets by robtop and geode team, modified by solstacoded
 robtop cube asset - by robtop
 info assets - put together by solstacoded based upon robtop's level objects
+miniz - https://github.com/richgel999/miniz/releases/tag/3.1.0 (public domain)
