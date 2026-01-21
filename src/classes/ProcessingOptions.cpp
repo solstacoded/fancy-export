@@ -1,7 +1,7 @@
 #include "ProcessingOptions.hpp"
 
 #include <Geode/Geode.hpp>
-#include <Geode/utils.hpp>
+#include <Geode/Utils.hpp>
 #include <Geode/utils/terminate.hpp>
 
 char const* ProcessingOptions::getString(ProcessingOption option) {

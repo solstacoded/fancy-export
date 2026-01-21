@@ -34,3 +34,5 @@ button & square assets - original assets by robtop and geode team, modified by s
 robtop cube asset - by robtop
 
 info assets - put together by solstacoded based upon robtop's level objects
+
+miniz - https://github.com/richgel999/miniz/releases/tag/3.1.0 (public domain)
