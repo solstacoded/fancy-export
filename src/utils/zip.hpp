@@ -1,6 +1,6 @@
 #pragma once
 
-#include <string>
+#include <Geode/Geode.hpp>
 
 #ifdef GEODE_IS_ANDROID
 #define FANCY_EXPORT_COMPRESS_MINIZ
